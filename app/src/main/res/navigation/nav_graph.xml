@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/healthProfileFragment">
+
+    <fragment
+        android:id="@+id/healthProfileFragment"
+        android:name="vn.edu.vlu.milestone2.ui.profile.HealthProfileFragment"
+        android:label="Hồ sơ" />
+
+    <fragment
+        android:id="@+id/scannerFragment"
+        android:name="vn.edu.vlu.milestone2.ui.scanner.ScannerFragment"
+        android:label="Quét mã" />
+
+    <fragment
+        android:id="@+id/cameraFragment"
+        android:name="vn.edu.vlu.milestone2.ui.camera.CameraFragment"
+        android:label="Chụp ảnh" />
+
+    <fragment
+        android:id="@+id/analysisFragment"
+        android:name="vn.edu.vlu.milestone2.ui.analysis.AnalysisFragment"
+        android:label="Phân tích" />
+
+    <fragment
+        android:id="@+id/recipeFragment"
+        android:name="vn.edu.vlu.milestone2.ui.recipe.RecipeFragment"
+        android:label="Gợi ý" />
+
+</navigation>

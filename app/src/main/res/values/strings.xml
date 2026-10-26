@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">NutriScan</string>
+    <string name="action_scan">Quét mã vạch</string>
+    <string name="action_fallback">Chụp nhãn thay thế</string>
+    <string name="offline_queue_status">Đang chờ mạng để phân tích</string>
+    <string name="medical_disclaimer">Kết quả AI chỉ mang tính tham khảo, không thay thế tư vấn y tế.</string>
+</resources>

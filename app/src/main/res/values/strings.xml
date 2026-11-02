@@ -1,7 +1,23 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">NutriScan</string>
     <string name="action_scan">Quét mã vạch</string>
     <string name="action_fallback">Chụp nhãn thay thế</string>
     <string name="offline_queue_status">Đang chờ mạng để phân tích</string>
     <string name="medical_disclaimer">Kết quả AI chỉ mang tính tham khảo, không thay thế tư vấn y tế.</string>
+    <string name="profile_screen_title">Hồ sơ sức khỏe offline</string>
+    <string name="profile_offline_description">Dữ liệu được lưu cục bộ bằng Room và vẫn dùng được khi không có mạng.</string>
+    <string name="profile_create_title">Tạo hồ sơ mới</string>
+    <string name="profile_edit_title">Chỉnh sửa hồ sơ</string>
+    <string name="profile_full_name">Họ và tên</string>
+    <string name="profile_age">Tuổi</string>
+    <string name="profile_calorie_target">Mục tiêu năng lượng</string>
+    <string name="profile_conditions">Tình trạng sức khỏe</string>
+    <string name="profile_conditions_helper">Phân cách bằng dấu phẩy, ví dụ: Tiểu đường, Dị ứng đậu phộng</string>
+    <string name="profile_new">Làm mới</string>
+    <string name="profile_delete">Xóa</string>
+    <string name="profile_save">Lưu offline</string>
+    <string name="profile_saved_title">Hồ sơ đã lưu</string>
+    <string name="profile_empty">Chưa có hồ sơ. Hãy nhập thông tin và chọn “Lưu offline”.</string>
+    <string name="no_conditions">Không có</string>
+    <string name="profile_list_item" tools:ignore="PluralsCandidate">%1$s · %2$d tuổi · %3$d kcal\nTình trạng: %4$s</string>
 </resources>

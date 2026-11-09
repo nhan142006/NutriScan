@@ -20,4 +20,18 @@
     <string name="profile_empty">Chưa có hồ sơ. Hãy nhập thông tin và chọn “Lưu offline”.</string>
     <string name="no_conditions">Không có</string>
     <string name="profile_list_item" tools:ignore="PluralsCandidate">%1$s · %2$d tuổi · %3$d kcal\nTình trạng: %4$s</string>
+    <string name="login_title">Đăng nhập</string>
+    <string name="login_subtitle">Quét thông minh, lựa chọn dinh dưỡng tốt hơn</string>
+    <string name="login_action">Đăng nhập</string>
+    <string name="login_open_register">Chưa có tài khoản? Đăng ký</string>
+    <string name="register_title">Tạo tài khoản</string>
+    <string name="register_subtitle">Đăng ký để bắt đầu sử dụng NutriScan</string>
+    <string name="register_action">Đăng ký</string>
+    <string name="register_back_login">Đã có tài khoản? Đăng nhập</string>
+    <string name="register_password_helper">Tối thiểu 6 ký tự</string>
+    <string name="auth_email">Email</string>
+    <string name="auth_password">Mật khẩu</string>
+    <string name="auth_confirm_password">Xác nhận mật khẩu</string>
+    <string name="auth_signed_in_as">Đang đăng nhập với</string>
+    <string name="auth_logout">Đăng xuất</string>
 </resources>

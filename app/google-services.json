@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "369837881387",
+    "project_id": "nutriscan-6381d",
+    "storage_bucket": "nutriscan-6381d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:369837881387:android:66ebea016b4654cb3b526e",
+        "android_client_info": {
+          "package_name": "vn.edu.vlu.milestone2"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB2BtJzhUqEC6mbhYkBVWyGND9YuZy5ulY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -2,7 +2,17 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/healthProfileFragment">
+    app:startDestination="@id/loginFragment">
+
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="vn.edu.vlu.milestone2.ui.auth.LoginFragment"
+        android:label="@string/login_title" />
+
+    <fragment
+        android:id="@+id/registerFragment"
+        android:name="vn.edu.vlu.milestone2.ui.auth.RegisterFragment"
+        android:label="@string/register_title" />
 
     <fragment
         android:id="@+id/healthProfileFragment"

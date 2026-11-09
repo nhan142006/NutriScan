@@ -1,6 +1,7 @@
 package vn.edu.vlu.milestone2
 
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
@@ -24,5 +25,15 @@ class MainActivity : AppCompatActivity() {
 
         // Liên kết BottomNavigationView với NavController để điều hướng các tab
         binding.bottomNavigation.setupWithNavController(navController)
+
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            binding.bottomNavigation.visibility = if (
+                destination.id == R.id.loginFragment || destination.id == R.id.registerFragment
+            ) {
+                View.GONE
+            } else {
+                View.VISIBLE
+            }
+        }
     }
 }

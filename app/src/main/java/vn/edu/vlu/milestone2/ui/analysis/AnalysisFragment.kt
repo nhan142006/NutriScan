@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -18,6 +19,7 @@ import vn.edu.vlu.milestone2.core.ui.showState
 import vn.edu.vlu.milestone2.data.model.Nutrition
 import vn.edu.vlu.milestone2.databinding.FragmentAnalysisResultBinding
 import vn.edu.vlu.milestone2.domain.Verdict
+import vn.edu.vlu.milestone2.ui.detail.DetailViewModel
 import java.util.Locale
 
 class AnalysisFragment : Fragment() {
@@ -42,7 +44,14 @@ class AnalysisFragment : Fragment() {
             findNavController().navigate(R.id.scannerFragment)
         }
 
-        viewModel.analyze(arguments?.getString(ARG_BARCODE).orEmpty())
+        val barcode = arguments?.getString(ARG_BARCODE).orEmpty()
+        viewModel.analyze(barcode)
+        binding.buttonOpenDetail.setOnClickListener {
+            findNavController().navigate(
+                R.id.action_analysis_to_detail,
+                bundleOf(DetailViewModel.ARG_BARCODE to barcode)
+            )
+        }
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {

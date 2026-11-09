@@ -104,4 +104,11 @@
     <string name="recipe_watch_video">Xem video</string>
     <string name="recipe_close">Đóng</string>
     <string name="recipe_meta">%1$s · %2$s</string>
+    <string name="detail_title">Chi tiết sản phẩm</string>
+    <string name="detail_open">Xem chi tiết</string>
+    <string name="detail_ingredients">Thành phần: %1$s</string>
+    <string name="detail_save">Lưu sản phẩm</string>
+    <string name="detail_delete">Xóa sản phẩm đã lưu</string>
+    <string name="detail_delete_confirm">Xóa</string>
+    <string name="detail_delete_confirmation">Bạn có muốn xóa sản phẩm này khỏi các sản phẩm đã lưu trong tài khoản?</string>
 </resources>

@@ -7,6 +7,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import vn.edu.vlu.milestone2.BuildConfig
+import vn.edu.vlu.milestone2.data.remote.firestore.SavedProductApi
 import vn.edu.vlu.milestone2.data.remote.mealdb.MealDbApi
 import vn.edu.vlu.milestone2.data.remote.openfoodfacts.OpenFoodFactsApi
 import java.util.concurrent.TimeUnit
@@ -39,6 +40,10 @@ class NetworkModule(context: Context) {
 
     val mealDbApi: MealDbApi by lazy {
         createRetrofit(BuildConfig.MEAL_DB_BASE_URL).create(MealDbApi::class.java)
+    }
+
+    val savedProductApi: SavedProductApi by lazy {
+        createRetrofit("https://firestore.googleapis.com/").create(SavedProductApi::class.java)
     }
 
     private fun createRetrofit(baseUrl: String): Retrofit = Retrofit.Builder()

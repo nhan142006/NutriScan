@@ -1,19 +1,117 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent" android:layout_height="match_parent"
-    android:padding="@dimen/screen_padding">
-    <!-- LEARNING SCAFFOLD: group must complete and inspect constraints in Android Studio.
-         Use start/end constraints, 0dp match-constraints, Barrier and Chains where appropriate. -->
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/contentGuideline" android:layout_width="wrap_content"
-        android:layout_height="wrap_content" android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.5" />
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingHorizontal="@dimen/screen_padding"
+    android:paddingTop="@dimen/spacing_medium">
+
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/recipeTitle" android:layout_width="0dp" android:layout_height="wrap_content"
-        android:text="Gợi ý món ăn" android:textAppearance="?attr/textAppearanceHeadlineSmall"
-        app:layout_constraintTop_toTopOf="parent"
+        android:id="@+id/recipeTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/recipe_title"
+        android:textAppearance="?attr/textAppearanceHeadlineSmall"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-    <!-- TODO: Add MaterialCardView rows and query-context chips from HealthProfile + ScanResult. -->
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/recipeSubtitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="@string/recipe_subtitle"
+        android:textAppearance="?attr/textAppearanceBodyMedium"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/recipeTitle" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/layoutRecipeSearch"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:hint="@string/recipe_search_hint"
+        app:boxBackgroundMode="outline"
+        app:endIconMode="clear_text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/recipeSubtitle">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/inputRecipeSearch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:imeOptions="actionSearch"
+            android:inputType="text"
+            android:maxLength="60" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Danh mục món lấy từ API categories.php -->
+    <HorizontalScrollView
+        android:id="@+id/scrollCategories"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:scrollbars="none"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/layoutRecipeSearch">
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chipGroupCategories"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:selectionRequired="false"
+            app:singleLine="true"
+            app:singleSelection="true" />
+    </HorizontalScrollView>
+
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        android:id="@+id/progressDetail"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/scrollCategories" />
+
+    <include
+        android:id="@+id/stateView"
+        layout="@layout/view_network_state"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/progressDetail" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/textEmpty"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="@string/state_empty"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/stateView" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerRecipes"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        android:clipToPadding="false"
+        android:paddingBottom="@dimen/spacing_medium"
+        android:visibility="gone"
+        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+        app:spanCount="2"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textEmpty" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

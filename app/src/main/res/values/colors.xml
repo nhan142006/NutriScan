@@ -4,4 +4,10 @@
     <color name="white">#FFFFFFFF</color>
     <color name="status_error">#B3261E</color>
     <color name="status_success">#2E7D32</color>
+    <color name="status_warning">#E65100</color>
+    <color name="verdict_safe_bg">#E8F5E9</color>
+    <color name="verdict_caution_bg">#FFF3E0</color>
+    <color name="verdict_avoid_bg">#FFEBEE</color>
+    <color name="image_placeholder_tint">#9E9E9E</color>
+    <color name="error_banner_bg">#FDECEA</color>
 </resources>

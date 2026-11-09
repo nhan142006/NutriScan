@@ -7,6 +7,7 @@ import java.net.UnknownHostException
 
 class DetailRepository {
 
+    // Fetch detail by ID with network error & HTTP status code handling
     suspend fun fetchDetail(id: String): Result<String> = withContext(Dispatchers.IO) {
         try {
             // TODO: Replace with actual Retrofit API call
@@ -25,6 +26,7 @@ class DetailRepository {
         }
     }
 
+    // Delete item API call
     suspend fun deleteItem(id: String): Result<Boolean> = withContext(Dispatchers.IO) {
         try {
             // TODO: Replace with actual Retrofit delete call

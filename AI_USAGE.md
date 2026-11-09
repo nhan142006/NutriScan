@@ -120,3 +120,8 @@ Ghi chú về lịch sử commit: các commit do AI tạo ban đầu có dòng `
 ## 7. Tỷ lệ sử dụng AI (tự đánh giá)
 
 `[Nhóm tự điền — ước tính % trên tổng khối lượng milestone, có so sánh với giới hạn 30–50% của đề]`
+
+
+## 8. Bổ sung — Thành viên 4, Detail / Delete / Network Errors
+
+ChatGPT (Codex) được dùng để đọc repo, viết phần Chi tiết, thao tác lưu/xóa qua Firestore REST, xử lý lỗi và Retry, bổ sung ca kiểm thử Repository và mục 9 của worksheet. Phạm vi thay đổi được ghi trong diff của PR bổ sung. Việc cấu hình Firestore, chạy thử trên thiết bị, kiểm tra code và quay video thuộc phần xác nhận của nhóm. Phiên làm việc này chưa chạy được unit test vì Gradle Wrapper không tải được bản phân phối Gradle.

@@ -59,6 +59,15 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/layoutBarcode" />
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/buttonOpenDetail"
+        style="@style/Widget.Material3.Button.TextButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/detail_open"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/layoutBarcode" />
+
     <!-- Hàng 2: tìm kiếm theo tên -->
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/layoutSearch"
@@ -70,7 +79,7 @@
         app:boxBackgroundMode="outline"
         app:layout_constraintEnd_toStartOf="@id/buttonSearch"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/layoutBarcode">
+        app:layout_constraintTop_toBottomOf="@id/buttonOpenDetail">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/inputSearch"

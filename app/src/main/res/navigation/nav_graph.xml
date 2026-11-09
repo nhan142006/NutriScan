@@ -42,6 +42,9 @@
         <action
             android:id="@+id/action_scanner_to_analysis"
             app:destination="@id/analysisFragment" />
+        <action
+            android:id="@+id/action_scanner_to_detail"
+            app:destination="@id/detailFragment" />
     </fragment>
 
     <fragment
@@ -56,6 +59,18 @@
         <argument
             android:name="barcode"
             android:defaultValue=""
+            app:argType="string" />
+        <action
+            android:id="@+id/action_analysis_to_detail"
+            app:destination="@id/detailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/detailFragment"
+        android:name="vn.edu.vlu.milestone2.ui.detail.DetailFragment"
+        android:label="@string/detail_title">
+        <argument
+            android:name="barcode"
             app:argType="string" />
     </fragment>
 

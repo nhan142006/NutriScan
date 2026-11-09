@@ -1,7 +1,7 @@
 # Milestone 04 — Network Layer, RESTful API & Cloud Services Integration
 
 **Project:** NutriScan · **Course:** Mobile Application Programming (71ITSE30603 / 72ITSE30603)
-**Branch:** `feature/network-cloud-integration` · **Pull Request:** `<dán link PR đã merge>` · **Commit hash:** `<dán hash>`
+**Branch:** `feature/network-cloud-integration` · **Pull Request:** https://github.com/nhan142006/NutriScan/pull/3 · **Commit hash (main):** `14ebb0d`
 **Video demo (1–2 phút):** `<dán link YouTube unlisted / Google Drive>`
 
 ---

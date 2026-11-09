@@ -9,17 +9,24 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.NavOptions
+import androidx.navigation.fragment.findNavController
 import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.launch
 import vn.edu.vlu.milestone2.R
 import vn.edu.vlu.milestone2.data.local.NutriScanDatabase
+import vn.edu.vlu.milestone2.data.repository.AuthRepository
 import vn.edu.vlu.milestone2.data.repository.HealthProfile
 import vn.edu.vlu.milestone2.data.repository.HealthProfileRepository
 import vn.edu.vlu.milestone2.databinding.FragmentHealthProfileBinding
+import vn.edu.vlu.milestone2.ui.auth.AuthUiState
+import vn.edu.vlu.milestone2.ui.auth.AuthViewModel
+import vn.edu.vlu.milestone2.ui.auth.AuthViewModelFactory
 
 class HealthProfileFragment : Fragment() {
     private var _binding: FragmentHealthProfileBinding? = null
@@ -29,6 +36,10 @@ class HealthProfileFragment : Fragment() {
     private val viewModel: ProfileViewModel by viewModels {
         val dao = NutriScanDatabase.getInstance(requireContext()).healthProfileDao()
         ProfileViewModelFactory(HealthProfileRepository(dao))
+    }
+
+    private val authViewModel: AuthViewModel by activityViewModels {
+        AuthViewModelFactory(AuthRepository(requireContext()))
     }
 
     override fun onCreateView(
@@ -58,12 +69,32 @@ class HealthProfileFragment : Fragment() {
         binding.buttonSave.setOnClickListener { viewModel.saveProfile() }
         binding.buttonNew.setOnClickListener { viewModel.createNewProfile() }
         binding.buttonDelete.setOnClickListener { viewModel.deleteCurrentProfile() }
+        binding.buttonLogout.setOnClickListener { authViewModel.signOut() }
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect(::render)
             }
         }
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                authViewModel.uiState.collect(::renderAuth)
+            }
+        }
+    }
+
+    private fun renderAuth(state: AuthUiState) {
+        binding.textAccountEmail.text = state.userEmail.orEmpty()
+        if (!state.isAuthenticated) navigateToLogin()
+    }
+
+    private fun navigateToLogin() {
+        val navController = findNavController()
+        if (navController.currentDestination?.id == R.id.loginFragment) return
+        val options = NavOptions.Builder()
+            .setPopUpTo(R.id.nav_graph, true)
+            .build()
+        navController.navigate(R.id.loginFragment, null, options)
     }
 
     private fun render(state: ProfileUiState) = with(binding) {

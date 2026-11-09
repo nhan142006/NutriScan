@@ -4,6 +4,12 @@
     android:id="@+id/nav_graph"
     app:startDestination="@id/loginFragment">
 
+firebase-authentication
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="vn.edu.vlu.milestone2.ui.auth.LoginFragment"
+        android:label="@string/login_title" />
+
     <!-- Milestone 04: Firebase Authentication -->
     <fragment
         android:id="@+id/loginFragment"
@@ -18,10 +24,14 @@
             app:popUpTo="@id/nav_graph"
             app:popUpToInclusive="true" />
     </fragment>
+main
 
     <fragment
         android:id="@+id/registerFragment"
         android:name="vn.edu.vlu.milestone2.ui.auth.RegisterFragment"
+firebase-authentication
+        android:label="@string/register_title" />
+
         android:label="Đăng ký">
         <action
             android:id="@+id/action_register_to_home"
@@ -29,6 +39,7 @@
             app:popUpTo="@id/nav_graph"
             app:popUpToInclusive="true" />
     </fragment>
+main
 
     <fragment
         android:id="@+id/healthProfileFragment"

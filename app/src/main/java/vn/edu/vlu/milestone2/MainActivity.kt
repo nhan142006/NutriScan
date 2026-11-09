@@ -2,7 +2,10 @@ package vn.edu.vlu.milestone2
 
 import android.os.Bundle
 import android.view.View
+firebase-authentication
+
 import androidx.activity.viewModels
+main
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -57,6 +60,16 @@ class MainActivity : AppCompatActivity() {
         binding.toolbar.setupWithNavController(navController, appBarConfiguration)
         binding.bottomNavigation.setupWithNavController(navController)
 
+firebase-authentication
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            binding.bottomNavigation.visibility = if (
+                destination.id == R.id.loginFragment || destination.id == R.id.registerFragment
+            ) {
+                View.GONE
+            } else {
+                View.VISIBLE
+            }
+        }
         binding.toolbar.inflateMenu(R.menu.menu_main)
         binding.toolbar.setOnMenuItemClickListener { item ->
             if (item.itemId == R.id.action_logout) {
@@ -98,5 +111,6 @@ class MainActivity : AppCompatActivity() {
         } else {
             getString(R.string.auth_signed_in_as, user.displayName?.takeIf { it.isNotBlank() } ?: user.email)
         }
+main
     }
 }

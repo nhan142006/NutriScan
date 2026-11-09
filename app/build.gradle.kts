@@ -4,6 +4,12 @@ plugins {
     alias(libs.plugins.google.services)
 }
 
+// Cho phep du an van build truoc khi thanh vien them file cau hinh Firebase.
+// Plugin se tu dong duoc ap dung ngay khi app/google-services.json ton tai.
+if (file("google-services.json").exists()) {
+    apply(plugin = "com.google.gms.google-services")
+}
+
 android {
     namespace = "vn.edu.vlu.milestone2"
     compileSdk = 37
@@ -58,6 +64,10 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
+firebase-authentication
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.auth)
+
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.recyclerview)
@@ -74,6 +84,7 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)
     implementation(libs.kotlinx.coroutines.play.services)
+main
 
     // Thư viện hỗ trợ hàm by viewModels() trong Fragment
     implementation("androidx.fragment:fragment-ktx:1.8.5")

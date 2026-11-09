@@ -2,7 +2,33 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/healthProfileFragment">
+    app:startDestination="@id/loginFragment">
+
+    <!-- Milestone 04: Firebase Authentication -->
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="vn.edu.vlu.milestone2.ui.auth.LoginFragment"
+        android:label="Đăng nhập">
+        <action
+            android:id="@+id/action_login_to_register"
+            app:destination="@id/registerFragment" />
+        <action
+            android:id="@+id/action_login_to_home"
+            app:destination="@id/healthProfileFragment"
+            app:popUpTo="@id/nav_graph"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/registerFragment"
+        android:name="vn.edu.vlu.milestone2.ui.auth.RegisterFragment"
+        android:label="Đăng ký">
+        <action
+            android:id="@+id/action_register_to_home"
+            app:destination="@id/healthProfileFragment"
+            app:popUpTo="@id/nav_graph"
+            app:popUpToInclusive="true" />
+    </fragment>
 
     <fragment
         android:id="@+id/healthProfileFragment"
@@ -12,7 +38,11 @@
     <fragment
         android:id="@+id/scannerFragment"
         android:name="vn.edu.vlu.milestone2.ui.scanner.ScannerFragment"
-        android:label="Quét mã" />
+        android:label="Tra cứu">
+        <action
+            android:id="@+id/action_scanner_to_analysis"
+            app:destination="@id/analysisFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/cameraFragment"
@@ -22,7 +52,12 @@
     <fragment
         android:id="@+id/analysisFragment"
         android:name="vn.edu.vlu.milestone2.ui.analysis.AnalysisFragment"
-        android:label="Phân tích" />
+        android:label="Phân tích">
+        <argument
+            android:name="barcode"
+            android:defaultValue=""
+            app:argType="string" />
+    </fragment>
 
     <fragment
         android:id="@+id/recipeFragment"

@@ -7,14 +7,22 @@
 
     <LinearLayout
         android:layout_width="match_parent"
+firebase-authentication
         android:layout_height="match_parent"
         android:gravity="center_vertical"
         android:orientation="vertical"
         android:padding="24dp">
 
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="vertical"
+        android:padding="@dimen/screen_padding">
+main
+
         <com.google.android.material.textview.MaterialTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+firebase-authentication
             android:gravity="center"
             android:text="@string/register_title"
             android:textAppearance="?attr/textAppearanceHeadlineMedium"
@@ -33,6 +41,34 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="28dp"
+
+            android:layout_marginBottom="16dp"
+            android:text="@string/auth_register_title"
+            android:textAppearance="?attr/textAppearanceHeadlineSmall"
+            android:textStyle="bold" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/layoutDisplayName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/auth_display_name"
+            app:boxBackgroundMode="outline">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/inputDisplayName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:autofillHints="name"
+                android:imeOptions="actionNext"
+                android:inputType="textPersonName|textCapWords" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/layoutEmail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+main
             android:hint="@string/auth_email"
             app:boxBackgroundMode="outline">
 
@@ -42,6 +78,7 @@
                 android:layout_height="wrap_content"
                 android:autofillHints="emailAddress"
                 android:imeOptions="actionNext"
+firebase-authentication
                 android:inputType="textEmailAddress"
                 android:maxLength="120" />
         </com.google.android.material.textfield.TextInputLayout>
@@ -56,12 +93,26 @@
             app:endIconMode="password_toggle"
             app:helperText="@string/register_password_helper">
 
+                android:inputType="textEmailAddress" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/layoutPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:hint="@string/auth_password"
+            app:boxBackgroundMode="outline"
+            app:endIconMode="password_toggle">
+main
+
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/inputPassword"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:autofillHints="newPassword"
                 android:imeOptions="actionNext"
+firebase-authentication
                 android:inputType="textPassword"
                 android:maxLength="72" />
         </com.google.android.material.textfield.TextInputLayout>
@@ -71,6 +122,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
+
+                android:inputType="textPassword" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/layoutConfirmPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+main
             android:hint="@string/auth_confirm_password"
             app:boxBackgroundMode="outline"
             app:endIconMode="password_toggle">
@@ -81,14 +142,19 @@
                 android:layout_height="wrap_content"
                 android:autofillHints="newPassword"
                 android:imeOptions="actionDone"
+firebase-authentication
                 android:inputType="textPassword"
                 android:maxLength="72" />
+
+                android:inputType="textPassword" />
+main
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/textAuthError"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+firebase-authentication
             android:layout_marginTop="12dp"
             android:accessibilityLiveRegion="polite"
             android:textColor="@color/status_error"
@@ -117,10 +183,38 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/buttonBackToLogin"
+
+            android:layout_marginTop="8dp"
+            android:accessibilityLiveRegion="polite"
+            android:textColor="@color/status_error"
+            android:visibility="gone" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonRegister"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/auth_register_button" />
+
+        <ProgressBar
+            android:id="@+id/progressAuth"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="12dp"
+            android:visibility="gone" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonGoLogin"
+main
             style="@style/Widget.Material3.Button.TextButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
+firebase-authentication
             android:text="@string/register_back_login" />
+
+            android:text="@string/auth_go_login" />
+main
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

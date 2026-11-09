@@ -1,19 +1,155 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent" android:layout_height="match_parent"
-    android:padding="@dimen/screen_padding">
-    <!-- LEARNING SCAFFOLD: group must complete and inspect constraints in Android Studio.
-         Use start/end constraints, 0dp match-constraints, Barrier and Chains where appropriate. -->
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/contentGuideline" android:layout_width="wrap_content"
-        android:layout_height="wrap_content" android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.5" />
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingHorizontal="@dimen/screen_padding"
+    android:paddingTop="@dimen/spacing_medium">
+
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/barcodeTitle" android:layout_width="0dp" android:layout_height="wrap_content"
-        android:text="Quét mã vạch" android:textAppearance="?attr/textAppearanceHeadlineSmall"
-        app:layout_constraintTop_toTopOf="parent"
+        android:id="@+id/barcodeTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/scanner_title"
+        android:textAppearance="?attr/textAppearanceHeadlineSmall"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-    <!-- TODO: Add CameraX PreviewView, scanning overlay and fallback button. -->
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/barcodeSubtitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="@string/scanner_subtitle"
+        android:textAppearance="?attr/textAppearanceBodyMedium"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/barcodeTitle" />
+
+    <!-- Hàng 1: tra cứu theo mã vạch -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/layoutBarcode"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="8dp"
+        android:hint="@string/scanner_barcode_hint"
+        app:boxBackgroundMode="outline"
+        app:layout_constraintEnd_toStartOf="@id/buttonLookup"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/barcodeSubtitle">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/inputBarcode"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:imeOptions="actionGo"
+            android:inputType="number"
+            android:maxLength="14" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/buttonLookup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/scanner_lookup"
+        app:layout_constraintBottom_toBottomOf="@id/layoutBarcode"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/layoutBarcode" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/buttonOpenDetail"
+        style="@style/Widget.Material3.Button.TextButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/detail_open"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/layoutBarcode" />
+
+    <!-- Hàng 2: tìm kiếm theo tên -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/layoutSearch"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:hint="@string/scanner_search_hint"
+        app:boxBackgroundMode="outline"
+        app:layout_constraintEnd_toStartOf="@id/buttonSearch"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/buttonOpenDetail">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/inputSearch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:imeOptions="actionSearch"
+            android:inputType="text"
+            android:maxLength="60" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/buttonSearch"
+        style="@style/Widget.Material3.Button.TonalButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/scanner_search"
+        app:layout_constraintBottom_toBottomOf="@id/layoutSearch"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/layoutSearch" />
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/barrierInputs"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="layoutSearch,buttonSearch" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/textResultsTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="@string/scanner_results_title"
+        android:textAppearance="?attr/textAppearanceTitleMedium"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/barrierInputs" />
+
+    <include
+        android:id="@+id/stateView"
+        layout="@layout/view_network_state"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textResultsTitle" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/textEmpty"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="@string/state_empty"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/stateView" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerProducts"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        android:clipToPadding="false"
+        android:paddingBottom="@dimen/spacing_medium"
+        android:visibility="gone"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textEmpty" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -5,7 +5,7 @@
         android:title="Hồ sơ" />
     <item
         android:id="@+id/scannerFragment"
-        android:title="Quét mã" />
+        android:title="Tra cứu" />
     <item
         android:id="@+id/cameraFragment"
         android:title="Chụp ảnh" />

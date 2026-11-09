@@ -19,6 +19,7 @@ import vn.edu.vlu.milestone2.core.ui.showState
 import vn.edu.vlu.milestone2.data.model.ProductSummary
 import vn.edu.vlu.milestone2.databinding.FragmentBarcodeScannerBinding
 import vn.edu.vlu.milestone2.ui.analysis.AnalysisFragment
+import vn.edu.vlu.milestone2.ui.detail.DetailViewModel
 
 class ScannerFragment : Fragment() {
 
@@ -43,6 +44,14 @@ class ScannerFragment : Fragment() {
         binding.recyclerProducts.adapter = productAdapter
 
         binding.buttonLookup.setOnClickListener { lookupBarcode() }
+        binding.buttonOpenDetail.setOnClickListener {
+            readBarcode()?.let { barcode ->
+                findNavController().navigate(
+                    R.id.action_scanner_to_detail,
+                    bundleOf(DetailViewModel.ARG_BARCODE to barcode)
+                )
+            }
+        }
         binding.inputBarcode.setOnEditorActionListener { _, actionId, _ ->
             (actionId == EditorInfo.IME_ACTION_GO).also { if (it) lookupBarcode() }
         }
@@ -68,13 +77,17 @@ class ScannerFragment : Fragment() {
     }
 
     private fun lookupBarcode() {
+        readBarcode()?.let(::navigateToAnalysis)
+    }
+
+    private fun readBarcode(): String? {
         val barcode = binding.inputBarcode.text?.toString().orEmpty().trim()
         if (!ScannerViewModel.isValidBarcode(barcode)) {
             binding.layoutBarcode.error = getString(R.string.scanner_barcode_invalid)
-            return
+            return null
         }
         binding.layoutBarcode.error = null
-        navigateToAnalysis(barcode)
+        return barcode
     }
 
     private fun submitSearch() {

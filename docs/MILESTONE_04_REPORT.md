@@ -97,7 +97,7 @@ app/src/main/java/vn/edu/vlu/milestone2/
 | 8 | Cập nhật tên hiển thị (Firebase SDK) | `POST` | `https://identitytoolkit.googleapis.com/v1/accounts:update` | Gọi qua `FirebaseUser.updateProfile()` | Lỗi Firebase → `AuthError` |
 | 9 | Đăng nhập (Firebase SDK) | `POST` | `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword` | Gọi qua `signInWithEmailAndPassword()` | Lỗi Firebase → `AuthError` |
 
-> Endpoint 7–9 là REST API tương ứng của Firebase Authentication (Identity Toolkit); ứng dụng gọi chúng gián tiếp qua Firebase Auth SDK chứ không tự gọi bằng Retrofit. Ứng dụng **không dùng** `PUT`/`DELETE` vì hai API công khai trên chỉ cho phép đọc.
+> Endpoint 7–9 là REST API tương ứng của Firebase Authentication (Identity Toolkit); ứng dụng gọi chúng gián tiếp qua Firebase Auth SDK chứ không tự gọi bằng Retrofit. Lát cắt Chi tiết dùng Firestore REST để lưu và xóa bản ghi riêng của tài khoản (xem mục 9).
 
 ### 3.2 JSON payload structure
 
@@ -334,3 +334,50 @@ git checkout -b feature/network-cloud-integration
 git push -u origin feature/network-cloud-integration
 # GitHub → Compare & pull request → base: main → review → Merge pull request
 ```
+
+
+## 9. Thành viên 4 — Detail, Delete & Network Errors
+
+Từ **Tra cứu**, nhập mã vạch rồi bấm **Xem chi tiết**. Nút này cũng xuất hiện khi đã mở sản phẩm trong **Phân tích**. Màn Chi tiết dùng ViewBinding, Glide và hai `StateFlow` trong `DetailViewModel`: một cho nội dung sản phẩm, một cho thao tác lưu/xóa. `DetailRepository` dùng lại `ProductRepository` để đọc Open Food Facts và dùng `SavedProductApi` để thao tác trên bản ghi của tài khoản. Mỗi yêu cầu chạy qua `safeApiCall` trên `Dispatchers.IO`.
+
+### Endpoint & payload
+
+Gọi endpoint Firestore với header `Authorization: Bearer <Firebase ID token>`. Project ID lấy từ cấu hình Firebase và UID lấy từ phiên đăng nhập. Đường dẫn tài liệu là `https://firestore.googleapis.com/v1/projects/{projectId}/databases/(default)/documents/users/{uid}/savedProducts/{barcode}`.
+
+| Method | Endpoint | Payload | Kết quả và lỗi |
+|---|---|---|---|
+| GET | Open Food Facts, endpoint #1 | Không có body | 200 → dữ liệu chi tiết; 404 hoặc `status:0` → không tìm thấy; 400/429/5xx → banner và Thử lại |
+| GET | Tài liệu Firestore | Không có body | 200 → đã lưu; 404 → chưa lưu; 401/403/5xx → banner và Thử lại |
+| PATCH | Tài liệu Firestore | `{"fields":{"barcode":{"stringValue":"8934673573017"}}}` | 2xx → hiện nút Xóa; lỗi → banner và Thử lại |
+| DELETE | Tài liệu Firestore | Không có body | 2xx → hiện lại nút Lưu; 400/401/403/404/5xx → banner và Thử lại |
+
+Khi mất mạng hoặc timeout, banner dùng thông báo tương ứng. Nút **Thử lại** gửi lại đúng thao tác đã thất bại. DELETE yêu cầu xác nhận trước khi gửi lần đầu và chỉ xóa tài liệu của tài khoản trong Firestore. Nguồn dữ liệu công khai Open Food Facts vẫn cung cấp thông tin sản phẩm.
+
+### Cấu hình Firestore
+
+1. Trong đúng project Firebase của NutriScan, vào **Firestore Database → Create database** và tạo database `(default)` ở chế độ Production. Có thể dùng database `(default)` đã có.
+2. Vào **Firestore Database → Rules**, thêm khối sau vào trong `match /databases/{database}/documents` và chọn **Publish**. Giữ các rule đang dùng cho tính năng khác. Kiểm tra các rule wildcard hiện có vì một rule rộng cho phép truy cập vẫn có thể áp dụng đồng thời.
+
+```text
+match /users/{uid}/savedProducts/{barcode} {
+  allow get, delete: if request.auth != null && request.auth.uid == uid;
+  allow create, update: if request.auth != null
+    && request.auth.uid == uid
+    && request.resource.data.keys().hasOnly(['barcode'])
+    && request.resource.data.barcode == barcode;
+}
+```
+
+### Demo và bằng chứng
+
+1. Đăng nhập. Từ **Tra cứu**, nhập mã vạch sản phẩm đã xác nhận có trên Open Food Facts → **Xem chi tiết**. Kiểm tra ảnh, tên, mã vạch, Nutri-Score và thành phần.
+2. Bấm **Lưu sản phẩm** → kiểm tra tài liệu xuất hiện trong **Firestore Database → Data**. Bấm **Xóa sản phẩm đã lưu → Hủy** để kiểm tra tài liệu còn tồn tại. Lặp lại và xác nhận **Xóa** để kiểm tra tài liệu biến mất.
+3. Mở lại Chi tiết với Chế độ máy bay bật và Wi-Fi tắt. Kiểm tra thông báo mất mạng. Bật mạng, bấm **Thử lại** và kiểm tra chi tiết hiện lại. Có thể lặp lại từ màn đã lưu để thử lỗi DELETE.
+4. Thử mã vạch hợp lệ về định dạng nhưng không tồn tại để thấy HTTP 404. `DetailRepositoryTest` mô phỏng DELETE thành công/HTTP 500 và GET bản ghi chưa lưu. `ProductRepositoryTest` đã có ca 404, 500 và timeout cho endpoint mã vạch. Chạy `gradlew.bat :app:testDebugUnitTest` trên Windows để xác nhận.
+5. Chụp **Authentication → Users**, **Authentication → Sign-in method** và **Firestore Database → Rules** cho worksheet.
+
+| Thành viên | Feature slice | File chính | Số commit |
+|---|---|---|---|
+| Thành viên 4 | Chi tiết theo barcode, lưu/xóa sản phẩm theo tài khoản, xác nhận xóa và Retry | `ui/detail/**`, `DetailRepository.kt`, `SavedProductApi.kt`, `DetailRepositoryTest.kt` | Điền theo lịch sử commit sau khi kiểm tra và hoàn thiện PR |
+
+Tài liệu tham khảo: [Cloud Firestore REST API](https://firebase.google.com/docs/firestore/use-rest-api) · [Firestore Security Rules](https://firebase.google.com/docs/firestore/security/get-started).

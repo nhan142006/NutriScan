@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-firebase-authentication
-    <uses-permission android:name="android.permission.INTERNET" />
-
-    <!-- Milestone 04: gọi REST API qua HTTPS và kiểm tra trạng thái mạng (Chế độ máy bay) -->
+    <!-- Milestone 04: REST API qua HTTPS + kiểm tra trạng thái mạng (Chế độ máy bay) -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-main
+    <!-- CameraX: chụp nhãn thành phần + quét mã vạch ML Kit -->
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <uses-feature
+        android:name="android.hardware.camera.any"
+        android:required="false" />
 
     <application
         android:name=".NutriScanApp"
@@ -19,14 +20,13 @@ main
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Milestone2">
+        android:theme="@style/Theme.NutriScan">
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

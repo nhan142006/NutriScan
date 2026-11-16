@@ -22,5 +22,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Milestone2"
+rootProject.name = "NutriScan"
 include(":app")

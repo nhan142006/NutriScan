@@ -1,5 +1,9 @@
 package vn.edu.vlu.milestone2.data.repository
 
+import com.google.gson.Gson
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.runTest
 import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.MockResponse
@@ -14,6 +18,11 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import vn.edu.vlu.milestone2.core.network.NetworkError
 import vn.edu.vlu.milestone2.core.network.NetworkResult
+import vn.edu.vlu.milestone2.data.local.dao.FavoriteDao
+import vn.edu.vlu.milestone2.data.local.dao.ProductDao
+import vn.edu.vlu.milestone2.data.local.entity.FavoriteProductEntity
+import vn.edu.vlu.milestone2.data.local.entity.ProductEntity
+import vn.edu.vlu.milestone2.data.local.model.FavoriteWithProduct
 import vn.edu.vlu.milestone2.data.remote.openfoodfacts.OpenFoodFactsApi
 import java.util.concurrent.TimeUnit
 
@@ -39,7 +48,8 @@ class ProductRepositoryTest {
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(OpenFoodFactsApi::class.java)
-        repository = ProductRepository(api)
+        // Room được thay bằng DAO giả trong bộ nhớ → kiểm thử thuần JVM.
+        repository = ProductRepository(api, FakeProductDao(), FakeFavoriteDao(), Gson())
     }
 
     @After
@@ -73,7 +83,7 @@ class ProductRepositoryTest {
         val result = repository.getProduct("8934673573017")
 
         assertTrue(result is NetworkResult.Success)
-        val product = (result as NetworkResult.Success).data
+        val product = (result as NetworkResult.Success).data.product
         assertEquals("Sữa tươi tiệt trùng", product.name)
         assertEquals("Vinamilk", product.brand)
         assertEquals("B", product.nutriScore)
@@ -146,5 +156,30 @@ class ProductRepositoryTest {
         val error = result as NetworkResult.Error
         assertEquals(expected, error.error)
         if (httpCode != null) assertEquals(httpCode, error.httpCode)
+    }
+}
+
+private class FakeProductDao : ProductDao {
+    private val items = MutableStateFlow<Map<String, ProductEntity>>(emptyMap())
+    override suspend fun getProduct(barcode: String): ProductEntity? = items.value[barcode]
+    override fun observeProduct(barcode: String): Flow<ProductEntity?> = items.map { it[barcode] }
+    override suspend fun upsertProduct(product: ProductEntity) {
+        items.value = items.value + (product.barcode to product)
+    }
+    override suspend fun pruneCache(olderThan: Long): Int = 0
+}
+
+private class FakeFavoriteDao : FavoriteDao {
+    private val favorites = MutableStateFlow<List<FavoriteProductEntity>>(emptyList())
+    override fun observeFavorites(): Flow<List<FavoriteWithProduct>> = MutableStateFlow(emptyList())
+    override fun observeIsFavorite(barcode: String): Flow<Boolean> = favorites.map { list -> list.any { it.productBarcode == barcode } }
+    override suspend fun insert(favorite: FavoriteProductEntity): Long {
+        favorites.value = favorites.value + favorite
+        return favorites.value.size.toLong()
+    }
+    override suspend fun delete(barcode: String): Int {
+        val before = favorites.value.size
+        favorites.value = favorites.value.filterNot { it.productBarcode == barcode }
+        return before - favorites.value.size
     }
 }

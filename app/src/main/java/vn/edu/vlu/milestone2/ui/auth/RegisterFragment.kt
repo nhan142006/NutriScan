@@ -4,38 +4,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-firebase-authentication
-import android.view.inputmethod.EditorInfo
-import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.NavOptions
-import androidx.navigation.fragment.findNavController
-import kotlinx.coroutines.launch
-import vn.edu.vlu.milestone2.R
-import vn.edu.vlu.milestone2.data.repository.AuthRepository
-import vn.edu.vlu.milestone2.databinding.FragmentRegisterBinding
-
-class RegisterFragment : Fragment() {
-    private var _binding: FragmentRegisterBinding? = null
-    private val binding get() = _binding!!
-
-    private val viewModel: AuthViewModel by activityViewModels {
-        AuthViewModelFactory(AuthRepository(requireContext()))
-    }
-
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
-import kotlinx.coroutines.launch
 import vn.edu.vlu.milestone2.R
+import vn.edu.vlu.milestone2.core.ui.collectWithLifecycle
+import vn.edu.vlu.milestone2.core.ui.navigateToTab
+import vn.edu.vlu.milestone2.core.ui.showSnackbar
 import vn.edu.vlu.milestone2.databinding.FragmentRegisterBinding
 
 class RegisterFragment : Fragment() {
@@ -44,13 +20,8 @@ class RegisterFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: AuthViewModel by viewModels { AuthViewModel.Factory }
-main
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentRegisterBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -58,90 +29,42 @@ main
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-firebase-authentication
-        binding.inputEmail.doAfterTextChanged { viewModel.clearErrors() }
-        binding.inputPassword.doAfterTextChanged { viewModel.clearErrors() }
-        binding.inputConfirmPassword.doAfterTextChanged { viewModel.clearErrors() }
-        binding.inputConfirmPassword.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_DONE) {
-                submit()
-                true
-            } else {
-                false
-            }
+        binding.editEmail.doAfterTextChanged { viewModel.onEmailChanged(it.toString()) }
+        binding.editPassword.doAfterTextChanged {
+            viewModel.onPasswordChanged(it.toString())
+            viewModel.onConfirmChanged(it.toString(), binding.editConfirm.text.toString())
         }
-        binding.buttonRegister.setOnClickListener { submit() }
-        binding.buttonBackToLogin.setOnClickListener { findNavController().popBackStack() }
-
+        binding.editConfirm.doAfterTextChanged {
+            viewModel.onConfirmChanged(binding.editPassword.text.toString(), it.toString())
+        }
         binding.buttonRegister.setOnClickListener {
             viewModel.register(
-                displayName = binding.inputDisplayName.text?.toString().orEmpty(),
-                email = binding.inputEmail.text?.toString().orEmpty(),
-                password = binding.inputPassword.text?.toString().orEmpty(),
-                confirmPassword = binding.inputConfirmPassword.text?.toString().orEmpty()
+                name = binding.editName.text.toString(),
+                email = binding.editEmail.text.toString().trim(),
+                password = binding.editPassword.text.toString(),
+                confirm = binding.editConfirm.text.toString()
             )
         }
         binding.buttonGoLogin.setOnClickListener { findNavController().navigateUp() }
-main
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.uiState.collect(::render)
+        collectWithLifecycle(viewModel.form) { state ->
+            binding.layoutName.error = state.nameError?.let { getString(it) }
+            binding.layoutEmail.error = state.emailError?.let { getString(it) }
+            binding.layoutPassword.error = state.passwordError?.let { getString(it) }
+            binding.layoutConfirm.error = state.confirmError?.let { getString(it) }
+            binding.progressRegister.visibility = if (state.isLoading) View.VISIBLE else View.INVISIBLE
+            binding.buttonRegister.isEnabled = !state.isLoading
+        }
+        collectWithLifecycle(viewModel.events) { event ->
+            when (event) {
+                // Tài khoản mới → tạo Hồ sơ sức khỏe ngay để AI cá nhân hóa kết quả.
+                AuthEvent.Registered, AuthEvent.LoggedIn -> {
+                    findNavController().navigate(R.id.action_register_to_home)
+                    navigateToTab(R.id.profileFragment)
+                }
+                is AuthEvent.ShowError -> binding.root.showSnackbar(getString(event.message), long = true)
             }
         }
-    }
-
-firebase-authentication
-    private fun submit() {
-        viewModel.register(
-            emailInput = binding.inputEmail.text?.toString().orEmpty(),
-            password = binding.inputPassword.text?.toString().orEmpty(),
-            confirmPassword = binding.inputConfirmPassword.text?.toString().orEmpty()
-        )
-    }
-
-    private fun render(state: AuthUiState) = with(binding) {
-        inputEmailLayout.error = state.emailError
-        inputPasswordLayout.error = state.passwordError
-        inputConfirmPasswordLayout.error = state.confirmPasswordError
-        textAuthError.text = state.errorMessage.orEmpty()
-        textAuthError.isVisible = state.errorMessage != null
-        progressRegister.isVisible = state.isLoading
-        buttonRegister.text = if (state.isLoading) "" else getString(R.string.register_action)
-        buttonRegister.isEnabled = !state.isLoading
-        buttonBackToLogin.isEnabled = !state.isLoading
-
-        if (state.isAuthenticated) navigateToHome()
-    }
-
-    private fun navigateToHome() {
-        val navController = findNavController()
-        if (navController.currentDestination?.id != R.id.registerFragment) return
-        val options = NavOptions.Builder()
-            .setPopUpTo(R.id.loginFragment, true)
-            .build()
-        navController.navigate(R.id.healthProfileFragment, null, options)
-
-    private fun render(state: AuthUiState) = with(binding) {
-        layoutDisplayName.error = state.nameError?.let { getString(it) }
-        layoutEmail.error = state.emailError?.let { getString(it) }
-        layoutPassword.error = state.passwordError?.let { getString(it) }
-        layoutConfirmPassword.error = state.confirmPasswordError?.let { getString(it) }
-
-        textAuthError.visibility = if (state.authError != null) View.VISIBLE else View.GONE
-        state.authError?.let { textAuthError.setText(it.toMessageRes()) }
-
-        progressAuth.visibility = if (state.isLoading) View.VISIBLE else View.GONE
-        buttonRegister.isEnabled = !state.isLoading
-        buttonGoLogin.isEnabled = !state.isLoading
-
-        if (state.isAuthenticated) {
-            val navController = findNavController()
-            if (navController.currentDestination?.id == R.id.registerFragment) {
-                navController.navigate(R.id.action_register_to_home)
-            }
-        }
-main
     }
 
     override fun onDestroyView() {

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="recipes_title">Món ăn lành mạnh</string>
+    <string name="recipes_for_you_title">Dành cho bạn</string>
+    <string name="recipes_context">Hồ sơ: %1$s\n%2$d sản phẩm đã quét phù hợp · loại trừ %3$d thành phần</string>
+    <string name="recipes_context_no_profile">Chưa có hồ sơ sức khỏe – hãy tạo hồ sơ để gợi ý chính xác hơn.</string>
+    <string name="recipes_focus">Nấu với: %1$s</string>
+    <string name="recipes_suggest_again">Gợi ý lại</string>
+    <string name="recipes_ai_offline_cache">Đang hiển thị gợi ý AI đã lưu lần trước.</string>
+    <string name="recipes_ai_empty">Chưa có gợi ý AI. Nhấn \"Gợi ý lại\" khi có mạng.</string>
+    <string name="recipes_matches_title">Từ sản phẩm bạn đã quét</string>
+    <string name="recipes_matches_title_with">Từ sản phẩm bạn đã quét · %1$s</string>
+    <string name="recipes_my_title">Món của tôi (đã lưu &amp; tự tạo)</string>
+    <string name="recipes_my_empty">Lưu món yêu thích hoặc tự tạo món – xem được cả khi offline.</string>
+    <string name="recipes_explore_title">Khám phá TheMealDB</string>
+    <string name="recipes_search_hint">Tìm món (ví dụ: chicken, salmon)</string>
+    <string name="recipes_add">Thêm món</string>
+    <string name="recipes_source_ai">Gợi ý AI</string>
+    <string name="recipes_source_user">Món tự tạo</string>
+
+    <string name="recipe_detail_title">Công thức</string>
+    <string name="recipe_ingredients">Nguyên liệu</string>
+    <string name="recipe_steps">Cách làm</string>
+    <string name="recipe_watch_video">Xem video hướng dẫn</string>
+    <string name="recipe_start_cooking">Bắt đầu nấu (Chế độ nấu)</string>
+    <string name="recipe_save">Lưu món</string>
+    <string name="recipe_unsave">Bỏ lưu</string>
+    <string name="recipe_saved">Đã lưu – xem được khi offline</string>
+    <string name="recipe_unsaved">Đã bỏ lưu</string>
+    <string name="recipe_compat_suitable">Phù hợp với hồ sơ của bạn</string>
+    <string name="recipe_compat_limit">Nên điều chỉnh / hạn chế</string>
+    <string name="recipe_compat_avoid">Không phù hợp với hồ sơ</string>
+    <string name="recipe_compat_ok">• Không phát hiện nguyên liệu xung đột với hồ sơ.</string>
+    <string name="recipe_based_on_scans">Dựa trên %1$d sản phẩm bạn đã quét</string>
+    <string name="recipe_delete_title">Xóa món này?</string>
+    <string name="recipe_deleted">Đã xóa món</string>
+
+    <string name="cooking_title">Chế độ nấu</string>
+    <string name="cooking_previous">Trước</string>
+    <string name="cooking_next">Tiếp</string>
+    <string name="cooking_finish">Hoàn tất</string>
+    <string name="cooking_step_counter">Bước %1$d / %2$d</string>
+    <string name="cooking_checklist">Nguyên liệu (%1$d/%2$d đã chuẩn bị)</string>
+    <string name="cooking_done">Chúc ngon miệng! 🍲</string>
+    <string name="cooking_no_steps">Công thức chưa có bước hướng dẫn.</string>
+
+    <string name="add_edit_recipe_title">Món của tôi</string>
+    <string name="add_recipe_title_hint">Tên món</string>
+    <string name="add_recipe_category_hint">Loại món (tùy chọn)</string>
+    <string name="add_recipe_ingredients_hint">Nguyên liệu</string>
+    <string name="add_recipe_steps_hint">Các bước nấu</string>
+    <string name="add_recipe_one_per_line">Mỗi dòng một mục</string>
+    <string name="add_recipe_save">Lưu món</string>
+    <string name="add_recipe_error_title">Vui lòng nhập tên món.</string>
+    <string name="add_recipe_error_ingredients">Cần ít nhất 1 nguyên liệu.</string>
+    <string name="add_recipe_error_steps">Cần ít nhất 1 bước.</string>
+    <string name="add_recipe_saved">Đã lưu món</string>
+</resources>

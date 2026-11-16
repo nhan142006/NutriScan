@@ -1,147 +1,5 @@
 package vn.edu.vlu.milestone2.ui.auth
 
-firebase-authentication
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
-import vn.edu.vlu.milestone2.data.repository.AuthRepository
-
-data class AuthUiState(
-    val isLoading: Boolean = false,
-    val isAuthenticated: Boolean = false,
-    val userEmail: String? = null,
-    val emailError: String? = null,
-    val passwordError: String? = null,
-    val confirmPasswordError: String? = null,
-    val errorMessage: String? = null
-)
-
-class AuthViewModel(
-    private val repository: AuthRepository
-) : ViewModel() {
-    private val _uiState = MutableStateFlow(
-        AuthUiState(
-            isAuthenticated = repository.isSignedIn,
-            userEmail = repository.currentUserEmail
-        )
-    )
-    val uiState: StateFlow<AuthUiState> = _uiState.asStateFlow()
-
-    fun signIn(emailInput: String, password: String) {
-        if (_uiState.value.isLoading) return
-        val email = emailInput.trim()
-        if (!validate(email, password)) return
-
-        viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
-            runCatching { repository.signIn(email, password) }
-                .onSuccess {
-                    _uiState.value = AuthUiState(
-                        isAuthenticated = true,
-                        userEmail = repository.currentUserEmail ?: email
-                    )
-                }
-                .onFailure { throwable ->
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = false,
-                        errorMessage = throwable.message ?: "Đăng nhập thất bại."
-                    )
-                }
-        }
-    }
-
-    fun register(emailInput: String, password: String, confirmPassword: String) {
-        if (_uiState.value.isLoading) return
-        val email = emailInput.trim()
-        val isValid = validate(email, password)
-        val confirmError = if (confirmPassword != password) "Mật khẩu xác nhận không khớp." else null
-        if (!isValid || confirmError != null) {
-            _uiState.value = _uiState.value.copy(confirmPasswordError = confirmError)
-            return
-        }
-
-        viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
-            runCatching { repository.register(email, password) }
-                .onSuccess {
-                    _uiState.value = AuthUiState(
-                        isAuthenticated = true,
-                        userEmail = repository.currentUserEmail ?: email
-                    )
-                }
-                .onFailure { throwable ->
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = false,
-                        errorMessage = throwable.message ?: "Đăng ký thất bại."
-                    )
-                }
-        }
-    }
-
-    fun signOut() {
-        repository.signOut()
-        _uiState.value = AuthUiState()
-    }
-
-    fun clearErrors() {
-        val state = _uiState.value
-        if (
-            state.emailError != null || state.passwordError != null ||
-            state.confirmPasswordError != null || state.errorMessage != null
-        ) {
-            _uiState.value = state.copy(
-                emailError = null,
-                passwordError = null,
-                confirmPasswordError = null,
-                errorMessage = null
-            )
-        }
-    }
-
-    private fun validate(email: String, password: String): Boolean {
-        val emailError = when {
-            email.isBlank() -> "Vui lòng nhập email."
-            !EMAIL_PATTERN.matches(email) -> "Email không hợp lệ."
-            else -> null
-        }
-        val passwordError = when {
-            password.isBlank() -> "Vui lòng nhập mật khẩu."
-            password.length < 6 -> "Mật khẩu cần có ít nhất 6 ký tự."
-            else -> null
-        }
-        _uiState.value = _uiState.value.copy(
-            emailError = emailError,
-            passwordError = passwordError,
-            confirmPasswordError = null,
-            errorMessage = null
-        )
-        return emailError == null && passwordError == null
-    }
-
-    companion object {
-        private val EMAIL_PATTERN = Regex(
-            pattern = "^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}$",
-            option = RegexOption.IGNORE_CASE
-        )
-    }
-}
-
-class AuthViewModelFactory(
-    private val repository: AuthRepository
-) : ViewModelProvider.Factory {
-    @Suppress("UNCHECKED_CAST")
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        require(modelClass.isAssignableFrom(AuthViewModel::class.java)) {
-            "Unsupported ViewModel: ${modelClass.name}"
-        }
-        return AuthViewModel(repository) as T
-    }
-}
-
 import android.util.Patterns
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
@@ -149,108 +7,119 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import vn.edu.vlu.milestone2.R
 import vn.edu.vlu.milestone2.data.repository.AuthError
 import vn.edu.vlu.milestone2.data.repository.AuthRepository
 import vn.edu.vlu.milestone2.data.repository.AuthResult
+import vn.edu.vlu.milestone2.data.repository.HealthProfileRepository
 import vn.edu.vlu.milestone2.di.ServiceLocator
 
-data class AuthUiState(
-    val isLoading: Boolean = false,
+/** Lỗi validate theo từng ô nhập (TextInputLayout.error) – lưu id chuỗi, không giữ Context. */
+data class AuthFormState(
     @StringRes val nameError: Int? = null,
     @StringRes val emailError: Int? = null,
     @StringRes val passwordError: Int? = null,
-    @StringRes val confirmPasswordError: Int? = null,
-    val authError: AuthError? = null,
-    val isAuthenticated: Boolean = false
+    @StringRes val confirmError: Int? = null,
+    val isLoading: Boolean = false
 )
 
-/**
- * ViewModel cho Đăng nhập / Đăng ký.
- * UI -> AuthViewModel -> AuthRepository -> Firebase Authentication.
- */
+sealed interface AuthEvent {
+    data object LoggedIn : AuthEvent
+    data object Registered : AuthEvent
+    data class ShowError(@StringRes val message: Int) : AuthEvent
+}
+
 class AuthViewModel(
     private val authRepository: AuthRepository,
-    private val emailValidator: (String) -> Boolean = { Patterns.EMAIL_ADDRESS.matcher(it).matches() }
+    private val profileRepository: HealthProfileRepository
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(AuthUiState())
-    val uiState: StateFlow<AuthUiState> = _uiState.asStateFlow()
+    private val _form = MutableStateFlow(AuthFormState())
+    val form: StateFlow<AuthFormState> = _form.asStateFlow()
 
-    fun login(email: String, password: String) {
-        val emailError = validateEmail(email)
-        val passwordError = validatePassword(password)
-        _uiState.update {
-            it.copy(emailError = emailError, passwordError = passwordError, authError = null)
-        }
+    private val _events = Channel<AuthEvent>(Channel.BUFFERED)
+    val events: Flow<AuthEvent> = _events.receiveAsFlow()
+
+    /** Validate real-time khi người dùng gõ (gọi từ doAfterTextChanged). */
+    fun onEmailChanged(email: String) = _form.update {
+        it.copy(emailError = if (email.isBlank() || isValidEmail(email)) null else R.string.auth_validation_email)
+    }
+
+    fun onPasswordChanged(password: String) = _form.update {
+        it.copy(passwordError = if (password.isEmpty() || password.length >= MIN_PASSWORD) null else R.string.auth_validation_password)
+    }
+
+    fun onConfirmChanged(password: String, confirm: String) = _form.update {
+        it.copy(confirmError = if (confirm.isEmpty() || confirm == password) null else R.string.auth_validation_confirm)
+    }
+
+    fun signIn(email: String, password: String) {
+        if (_form.value.isLoading) return
+        val emailError = if (isValidEmail(email)) null else R.string.auth_validation_email
+        val passwordError = if (password.length >= MIN_PASSWORD) null else R.string.auth_validation_password
+        _form.value = AuthFormState(emailError = emailError, passwordError = passwordError)
         if (emailError != null || passwordError != null) return
 
-        authenticate { authRepository.signIn(email, password) }
-    }
-
-    fun register(displayName: String, email: String, password: String, confirmPassword: String) {
-        val nameError = if (displayName.isBlank()) R.string.auth_validation_name else null
-        val emailError = validateEmail(email)
-        val passwordError = validatePassword(password)
-        val confirmError = if (password != confirmPassword) R.string.auth_validation_confirm else null
-        _uiState.update {
-            it.copy(
-                nameError = nameError,
-                emailError = emailError,
-                passwordError = passwordError,
-                confirmPasswordError = confirmError,
-                authError = null
-            )
-        }
-        if (listOf(nameError, emailError, passwordError, confirmError).any { it != null }) return
-
-        authenticate { authRepository.register(displayName, email, password) }
-    }
-
-    private fun authenticate(request: suspend () -> AuthResult) {
-        if (_uiState.value.isLoading) return
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, authError = null) }
-            when (val result = request()) {
-                is AuthResult.Success -> _uiState.update {
-                    it.copy(isLoading = false, isAuthenticated = true)
+            _form.update { it.copy(isLoading = true) }
+            when (val result = authRepository.signIn(email, password)) {
+                is AuthResult.Success -> {
+                    profileRepository.restoreFromCloudIfMissing()
+                    _events.send(AuthEvent.LoggedIn)
                 }
-                is AuthResult.Failure -> _uiState.update {
-                    it.copy(isLoading = false, authError = result.error)
-                }
+                is AuthResult.Failure -> _events.send(AuthEvent.ShowError(result.error.toMessage()))
             }
+            _form.update { it.copy(isLoading = false) }
         }
     }
 
-    private fun validateEmail(email: String): Int? =
-        if (emailValidator(email.trim())) null else R.string.auth_validation_email
+    fun register(name: String, email: String, password: String, confirm: String) {
+        if (_form.value.isLoading) return
+        val state = AuthFormState(
+            nameError = if (name.isNotBlank()) null else R.string.auth_validation_name,
+            emailError = if (isValidEmail(email)) null else R.string.auth_validation_email,
+            passwordError = if (password.length >= MIN_PASSWORD) null else R.string.auth_validation_password,
+            confirmError = if (confirm == password) null else R.string.auth_validation_confirm
+        )
+        _form.value = state
+        if (listOf(state.nameError, state.emailError, state.passwordError, state.confirmError).any { it != null }) return
 
-    private fun validatePassword(password: String): Int? =
-        if (password.length >= MIN_PASSWORD_LENGTH) null else R.string.auth_validation_password
+        viewModelScope.launch {
+            _form.update { it.copy(isLoading = true) }
+            when (val result = authRepository.register(name, email, password)) {
+                is AuthResult.Success -> _events.send(AuthEvent.Registered)
+                is AuthResult.Failure -> _events.send(AuthEvent.ShowError(result.error.toMessage()))
+            }
+            _form.update { it.copy(isLoading = false) }
+        }
+    }
+
+    private fun isValidEmail(email: String) = Patterns.EMAIL_ADDRESS.matcher(email.trim()).matches()
+
+    private fun AuthError.toMessage(): Int = when (this) {
+        AuthError.INVALID_CREDENTIALS -> R.string.auth_error_invalid_credentials
+        AuthError.USER_NOT_FOUND -> R.string.auth_error_user_not_found
+        AuthError.EMAIL_ALREADY_IN_USE -> R.string.auth_error_email_in_use
+        AuthError.WEAK_PASSWORD -> R.string.auth_error_weak_password
+        AuthError.INVALID_EMAIL -> R.string.auth_error_invalid_email
+        AuthError.NETWORK -> R.string.auth_error_network
+        AuthError.TOO_MANY_REQUESTS -> R.string.auth_error_too_many_requests
+        AuthError.UNKNOWN -> R.string.auth_error_unknown
+    }
 
     companion object {
-        const val MIN_PASSWORD_LENGTH = 6
+        const val MIN_PASSWORD = 6
 
         val Factory: ViewModelProvider.Factory = viewModelFactory {
-            initializer { AuthViewModel(ServiceLocator.authRepository) }
+            initializer { AuthViewModel(ServiceLocator.authRepository, ServiceLocator.healthProfileRepository) }
         }
     }
 }
-
-@StringRes
-fun AuthError.toMessageRes(): Int = when (this) {
-    AuthError.INVALID_CREDENTIALS -> R.string.auth_error_invalid_credentials
-    AuthError.USER_NOT_FOUND -> R.string.auth_error_user_not_found
-    AuthError.EMAIL_ALREADY_IN_USE -> R.string.auth_error_email_in_use
-    AuthError.WEAK_PASSWORD -> R.string.auth_error_weak_password
-    AuthError.INVALID_EMAIL -> R.string.auth_error_invalid_email
-    AuthError.NETWORK -> R.string.auth_error_network
-    AuthError.TOO_MANY_REQUESTS -> R.string.auth_error_too_many_requests
-    AuthError.UNKNOWN -> R.string.auth_error_unknown
-}
-main

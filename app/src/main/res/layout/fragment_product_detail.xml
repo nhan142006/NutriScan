@@ -1,73 +1,376 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- Chi tiết sản phẩm (Open Food Facts): Flow helper tạo lưới dinh dưỡng 4 cột, Group bật/tắt nội dung -->
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="@dimen/screen_padding">
+        android:paddingHorizontal="@dimen/screen_padding"
+        android:paddingBottom="@dimen/spacing_large">
 
         <include
-            android:id="@+id/productState"
-            layout="@layout/view_network_state" />
-
-        <LinearLayout
-            android:id="@+id/productContent"
-            android:layout_width="match_parent"
+            android:id="@+id/network_state"
+            layout="@layout/view_network_state"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:visibility="gone">
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-            <ImageView
-                android:id="@+id/imageProduct"
-                android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:contentDescription="@string/product_image_description"
-                android:scaleType="centerCrop" />
+        <!-- Fallback: sản phẩm Việt Nam chưa có trong Open Food Facts -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_not_found"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_medium"
+            android:visibility="gone"
+            app:cardBackgroundColor="?attr/colorTertiaryContainer"
+            app:cardCornerRadius="@dimen/card_radius"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/network_state"
+            app:strokeWidth="0dp"
+            tools:visibility="visible">
 
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/textProductName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:textAppearance="?attr/textAppearanceHeadlineSmall" />
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/textBarcode"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/textProductMeta"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/textNutriScore"
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textAppearance="?attr/textAppearanceTitleMedium" />
+                android:padding="@dimen/card_padding">
 
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/textIngredients"
-                android:layout_width="match_parent"
+                <ImageView
+                    android:id="@+id/image_not_found"
+                    android:layout_width="@dimen/icon_large"
+                    android:layout_height="@dimen/icon_large"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_camera"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:tint="?attr/colorOnTertiaryContainer" />
+
+                <TextView
+                    android:id="@+id/text_not_found_title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/spacing_medium"
+                    android:text="@string/product_not_found_title"
+                    android:textAppearance="?attr/textAppearanceTitleMedium"
+                    android:textColor="?attr/colorOnTertiaryContainer"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/image_not_found"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/text_not_found_body"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_xsmall"
+                    android:text="@string/product_not_found_body"
+                    android:textAppearance="?attr/textAppearanceBodyMedium"
+                    android:textColor="?attr/colorOnTertiaryContainer"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="@id/text_not_found_title"
+                    app:layout_constraintTop_toBottomOf="@id/text_not_found_title" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/button_take_label_photo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_medium"
+                    android:text="@string/product_take_label_photo"
+                    app:icon="@drawable/ic_camera"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/text_not_found_body" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/image_product"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/hero_image_height"
+            android:layout_marginTop="@dimen/spacing_small"
+            android:background="?attr/colorSurfaceContainerLowest"
+            android:contentDescription="@string/image_description"
+            android:scaleType="fitCenter"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/card_not_found"
+            app:shapeAppearanceOverlay="@style/ShapeAppearance.NutriScan.Image" />
+
+        <TextView
+            android:id="@+id/text_cached"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/spacing_small"
+            android:background="@drawable/bg_rating_pill"
+            android:backgroundTint="?attr/colorSecondaryContainer"
+            android:drawablePadding="@dimen/spacing_xsmall"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="4dp"
+            android:text="@string/product_from_cache"
+            android:textAppearance="?attr/textAppearanceLabelSmall"
+            android:textColor="?attr/colorOnSecondaryContainer"
+            android:visibility="gone"
+            app:drawableStartCompat="@drawable/ic_cloud_off"
+            app:drawableTint="?attr/colorOnSecondaryContainer"
+            app:layout_constraintStart_toStartOf="@id/image_product"
+            app:layout_constraintTop_toTopOf="@id/image_product"
+            tools:visibility="visible" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_favorite"
+            style="@style/Widget.Material3.Button.IconButton.Filled.Tonal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/spacing_small"
+            android:contentDescription="@string/favorites_add"
+            app:icon="@drawable/ic_favorite_border"
+            app:layout_constraintEnd_toEndOf="@id/image_product"
+            app:layout_constraintTop_toTopOf="@id/image_product" />
+
+        <TextView
+            android:id="@+id/text_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_medium"
+            android:textAppearance="?attr/textAppearanceHeadlineSmall"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/image_product"
+            tools:text="Sữa tươi tiệt trùng có đường" />
+
+        <TextView
+            android:id="@+id/text_brand"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textAppearance="?attr/textAppearanceBodyMedium"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/text_name"
+            tools:text="Vinamilk · 180 ml · 8934673573332" />
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chip_group_scores"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_small"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/text_brand">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_nutriscore"
+                style="@style/Widget.Material3.Chip.Assist"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp" />
+                android:clickable="false"
+                tools:text="Nutri-Score C" />
 
-            <include
-                android:id="@+id/savedState"
-                layout="@layout/view_network_state" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/buttonSavedProduct"
-                style="@style/Widget.Material3.Button.OutlinedButton"
-                android:layout_width="match_parent"
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_nova"
+                style="@style/Widget.Material3.Chip.Assist"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:visibility="gone" />
+                android:clickable="false"
+                tools:text="NOVA 4" />
+        </com.google.android.material.chip.ChipGroup>
 
-        </LinearLayout>
-    </LinearLayout>
-</ScrollView>
+        <TextView
+            android:id="@+id/text_nutrition_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_large"
+            android:text="@string/product_nutrition_title"
+            android:textAppearance="@style/TextAppearance.NutriScan.SectionTitle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/chip_group_scores" />
+
+        <androidx.constraintlayout.helper.widget.Flow
+            android:id="@+id/flow_nutrition"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_small"
+            app:constraint_referenced_ids="text_energy,text_sugars,text_fat,text_sat_fat,text_salt,text_proteins,text_carbs,text_fiber"
+            app:flow_horizontalGap="@dimen/spacing_small"
+            app:flow_maxElementsWrap="4"
+            app:flow_verticalGap="@dimen/spacing_small"
+            app:flow_wrapMode="aligned"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/text_nutrition_title" />
+
+        <TextView
+            android:id="@+id/text_energy"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_rating_pill"
+            android:backgroundTint="?attr/colorSurfaceContainerHigh"
+            android:gravity="center"
+            android:paddingVertical="@dimen/spacing_small"
+            android:textAppearance="?attr/textAppearanceLabelMedium"
+            tools:text="Năng lượng\n62 kcal" />
+
+        <TextView
+            android:id="@+id/text_sugars"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_rating_pill"
+            android:backgroundTint="?attr/colorSurfaceContainerHigh"
+            android:gravity="center"
+            android:paddingVertical="@dimen/spacing_small"
+            android:textAppearance="?attr/textAppearanceLabelMedium"
+            tools:text="Đường\n4.8 g" />
+
+        <TextView
+            android:id="@+id/text_fat"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_rating_pill"
+            android:backgroundTint="?attr/colorSurfaceContainerHigh"
+            android:gravity="center"
+            android:paddingVertical="@dimen/spacing_small"
+            android:textAppearance="?attr/textAppearanceLabelMedium"
+            tools:text="Béo\n3.3 g" />
+
+        <TextView
+            android:id="@+id/text_sat_fat"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_rating_pill"
+            android:backgroundTint="?attr/colorSurfaceContainerHigh"
+            android:gravity="center"
+            android:paddingVertical="@dimen/spacing_small"
+            android:textAppearance="?attr/textAppearanceLabelMedium"
+            tools:text="Bão hòa\n2.1 g" />
+
+        <TextView
+            android:id="@+id/text_salt"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_rating_pill"
+            android:backgroundTint="?attr/colorSurfaceContainerHigh"
+            android:gravity="center"
+            android:paddingVertical="@dimen/spacing_small"
+            android:textAppearance="?attr/textAppearanceLabelMedium"
+            tools:text="Muối\n0.1 g" />
+
+        <TextView
+            android:id="@+id/text_proteins"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_rating_pill"
+            android:backgroundTint="?attr/colorSurfaceContainerHigh"
+            android:gravity="center"
+            android:paddingVertical="@dimen/spacing_small"
+            android:textAppearance="?attr/textAppearanceLabelMedium"
+            tools:text="Đạm\n3 g" />
+
+        <TextView
+            android:id="@+id/text_carbs"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_rating_pill"
+            android:backgroundTint="?attr/colorSurfaceContainerHigh"
+            android:gravity="center"
+            android:paddingVertical="@dimen/spacing_small"
+            android:textAppearance="?attr/textAppearanceLabelMedium"
+            tools:text="Carb\n5 g" />
+
+        <TextView
+            android:id="@+id/text_fiber"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_rating_pill"
+            android:backgroundTint="?attr/colorSurfaceContainerHigh"
+            android:gravity="center"
+            android:paddingVertical="@dimen/spacing_small"
+            android:textAppearance="?attr/textAppearanceLabelMedium"
+            tools:text="Xơ\n0 g" />
+
+        <TextView
+            android:id="@+id/text_ingredients_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_large"
+            android:text="@string/product_ingredients_title"
+            android:textAppearance="@style/TextAppearance.NutriScan.SectionTitle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/flow_nutrition" />
+
+        <TextView
+            android:id="@+id/text_ingredients"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_xsmall"
+            android:textAppearance="?attr/textAppearanceBodyMedium"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/text_ingredients_title"
+            tools:text="Sữa bò tươi (96%), đường (3.8%), chất ổn định (471, 460(i), 407, 466)..." />
+
+        <TextView
+            android:id="@+id/text_allergens"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_small"
+            android:drawablePadding="@dimen/spacing_small"
+            android:gravity="center_vertical"
+            android:textAppearance="?attr/textAppearanceBodyMedium"
+            android:textColor="@color/rating_limit"
+            app:drawableStartCompat="@drawable/ic_warning"
+            app:drawableTint="@color/rating_limit"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/text_ingredients"
+            tools:text="Chất gây dị ứng: milk" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_analyze"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_large"
+            android:paddingVertical="@dimen/spacing_medium"
+            android:text="@string/product_analyze"
+            app:icon="@drawable/ic_auto_awesome"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/text_allergens" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_recipes"
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/product_find_recipes"
+            app:icon="@drawable/ic_restaurant"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/button_analyze" />
+
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/progress_analyze"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_small"
+            android:indeterminate="true"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/button_recipes" />
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/group_content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:constraint_referenced_ids="image_product,button_favorite,text_name,text_brand,chip_group_scores,text_nutrition_title,flow_nutrition,text_energy,text_sugars,text_fat,text_sat_fat,text_salt,text_proteins,text_carbs,text_fiber,text_ingredients_title,text_ingredients,button_analyze,button_recipes"
+            tools:visibility="visible" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.core.widget.NestedScrollView>

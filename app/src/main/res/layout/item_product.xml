@@ -1,64 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    style="@style/Widget.Material3.CardView.Outlined"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/Widget.NutriScan.Card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="@dimen/spacing_small"
+    android:layout_marginVertical="@dimen/spacing_xsmall"
     android:clickable="true"
-    android:focusable="true"
-    app:cardCornerRadius="12dp">
+    android:focusable="true">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="12dp">
+        android:padding="@dimen/spacing_medium">
 
-        <ImageView
-            android:id="@+id/imageProduct"
-            android:layout_width="72dp"
-            android:layout_height="72dp"
-            android:contentDescription="@string/product_image_description"
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/image_product"
+            android:layout_width="@dimen/thumb_medium"
+            android:layout_height="@dimen/thumb_medium"
+            android:background="?attr/colorSurfaceContainerLowest"
+            android:contentDescription="@string/image_description"
             android:scaleType="centerCrop"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:shapeAppearanceOverlay="@style/ShapeAppearance.NutriScan.Image" />
 
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/textProductName"
+        <TextView
+            android:id="@+id/text_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
+            android:layout_marginStart="@dimen/spacing_medium"
             android:ellipsize="end"
             android:maxLines="2"
             android:textAppearance="?attr/textAppearanceTitleSmall"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/imageProduct"
-            app:layout_constraintTop_toTopOf="@id/imageProduct" />
+            app:layout_constraintEnd_toStartOf="@id/button_action"
+            app:layout_constraintStart_toEndOf="@id/image_product"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Sữa đậu nành Fami nguyên chất" />
 
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/textProductBrand"
+        <TextView
+            android:id="@+id/text_brand"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:layout_marginTop="2dp"
-            android:ellipsize="end"
-            android:maxLines="1"
             android:textAppearance="?attr/textAppearanceBodySmall"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/imageProduct"
-            app:layout_constraintTop_toBottomOf="@id/textProductName" />
+            android:textColor="?attr/colorOnSurfaceVariant"
+            app:layout_constraintEnd_toEndOf="@id/text_name"
+            app:layout_constraintStart_toStartOf="@id/text_name"
+            app:layout_constraintTop_toBottomOf="@id/text_name"
+            tools:text="Vinasoy · 8934563138165" />
 
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/textNutriScore"
-            android:layout_width="0dp"
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_nutriscore"
+            style="@style/Widget.Material3.Chip.Assist"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:layout_marginTop="4dp"
-            android:textAppearance="?attr/textAppearanceLabelMedium"
+            android:clickable="false"
+            android:textAppearance="?attr/textAppearanceLabelSmall"
+            app:layout_constraintStart_toStartOf="@id/text_name"
+            app:layout_constraintTop_toBottomOf="@id/text_brand"
+            tools:text="Nutri-Score B" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_action"
+            style="@style/Widget.Material3.Button.IconButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/favorites_remove"
+            android:visibility="gone"
+            app:icon="@drawable/ic_favorite"
+            app:iconTint="@color/rating_avoid"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/imageProduct"
-            app:layout_constraintTop_toBottomOf="@id/textProductBrand" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:visibility="visible" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

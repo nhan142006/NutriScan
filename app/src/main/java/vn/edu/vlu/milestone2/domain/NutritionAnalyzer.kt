@@ -1,101 +1,101 @@
 package vn.edu.vlu.milestone2.domain
 
+import vn.edu.vlu.milestone2.data.local.entity.Rating
+import vn.edu.vlu.milestone2.data.model.FlaggedIngredient
+import vn.edu.vlu.milestone2.data.model.HealthProfile
+import vn.edu.vlu.milestone2.data.model.LabelAnalysis
 import vn.edu.vlu.milestone2.data.model.Product
-import vn.edu.vlu.milestone2.data.repository.HealthProfile
+import vn.edu.vlu.milestone2.data.model.Severity
+import vn.edu.vlu.milestone2.domain.HealthKeywords.containsAny
+import java.util.Locale
 import kotlin.math.roundToInt
 
-enum class Verdict { SAFE, CAUTION, AVOID }
-
-data class AnalysisWarning(val level: Verdict, val message: String)
-
-data class AnalysisResult(
-    val verdict: Verdict,
-    val warnings: List<AnalysisWarning>
-)
-
 /**
- * Đối chiếu dữ liệu dinh dưỡng (lấy từ API) với Hồ sơ sức khỏe (lấy từ Room).
- * Ngưỡng "cao/trung bình" theo hệ thống nhãn đèn giao thông của FSA (Anh) trên 100 g.
- * Lớp thuần Kotlin, không phụ thuộc Android nên kiểm thử được bằng JUnit.
+ * Phân tích OFFLINE theo luật (dùng khi chưa có Gemini API key hoặc mất mạng).
+ * Ngưỡng "cao/trung bình" theo hệ thống nhãn đèn giao thông FSA (Anh) trên 100 g.
+ * Trả về cùng kiểu [LabelAnalysis] với Gemini để UI hiển thị thống nhất.
+ * Lớp thuần Kotlin → kiểm thử được bằng JUnit.
  */
 class NutritionAnalyzer {
 
-    fun analyze(product: Product, profile: HealthProfile?): AnalysisResult {
-        val warnings = mutableListOf<AnalysisWarning>()
-        val nutrition = product.nutrition
-        val conditions = profile?.conditions.orEmpty().map { it.lowercase() }
+    fun analyze(product: Product, profile: HealthProfile?): LabelAnalysis {
+        val flags = mutableListOf<FlaggedIngredient>()
+        val n = product.nutrition
+        val conditions = profile?.conditions.orEmpty().joinToString(" ").lowercase()
+        val allergies = profile?.allergies.orEmpty().joinToString(" ").lowercase()
 
-        // 1. Cảnh báo chung theo ngưỡng dinh dưỡng.
-        nutrition.sugars?.let { sugar ->
-            if (sugar > SUGAR_HIGH) warnings += caution("Hàm lượng đường cao: ${sugar.format()} g/100 g.")
-        }
-        nutrition.saturatedFat?.let { fat ->
-            if (fat > SAT_FAT_HIGH) warnings += caution("Chất béo bão hòa cao: ${fat.format()} g/100 g.")
-        }
-        nutrition.salt?.let { salt ->
-            if (salt > SALT_HIGH) warnings += caution("Hàm lượng muối cao: ${salt.format()} g/100 g.")
-        }
+        val diabetic = conditions.containsAny(HealthKeywords.DIABETES)
+        val hypertensive = conditions.containsAny(HealthKeywords.HYPERTENSION)
+        val cholesterol = conditions.containsAny(HealthKeywords.CHOLESTEROL)
 
-        // 2. Cảnh báo cá nhân hóa theo tình trạng sức khỏe.
-        if (conditions.any { it.containsAny(DIABETES_KEYWORDS) }) {
-            nutrition.sugars?.let { sugar ->
-                when {
-                    sugar > SUGAR_HIGH -> warnings += avoid("Không phù hợp người tiểu đường: đường ${sugar.format()} g/100 g.")
-                    sugar > SUGAR_MEDIUM -> warnings += caution("Người tiểu đường nên hạn chế: đường ${sugar.format()} g/100 g.")
-                }
+        n.sugars?.let { sugar ->
+            when {
+                sugar > SUGAR_HIGH -> flags += flag("Đường", "Hàm lượng đường cao: ${sugar.fmt()} g/100 g.", if (diabetic) Severity.HIGH else Severity.MEDIUM)
+                diabetic && sugar > SUGAR_MEDIUM -> flags += flag("Đường", "Người tiểu đường nên hạn chế: ${sugar.fmt()} g/100 g.", Severity.MEDIUM)
             }
         }
-        if (conditions.any { it.containsAny(HYPERTENSION_KEYWORDS) }) {
-            nutrition.salt?.let { salt ->
-                when {
-                    salt > SALT_HIGH -> warnings += avoid("Không phù hợp người tăng huyết áp: muối ${salt.format()} g/100 g.")
-                    salt > SALT_MEDIUM -> warnings += caution("Người tăng huyết áp nên hạn chế: muối ${salt.format()} g/100 g.")
-                }
+        n.salt?.let { salt ->
+            when {
+                salt > SALT_HIGH -> flags += flag("Muối", "Hàm lượng muối cao: ${salt.fmt()} g/100 g.", if (hypertensive) Severity.HIGH else Severity.MEDIUM)
+                hypertensive && salt > SALT_MEDIUM -> flags += flag("Muối", "Người tăng huyết áp nên hạn chế: ${salt.fmt()} g/100 g.", Severity.MEDIUM)
             }
         }
-        if (conditions.any { it.containsAny(HEART_KEYWORDS) }) {
-            nutrition.saturatedFat?.let { fat ->
-                when {
-                    fat > SAT_FAT_HIGH -> warnings += avoid("Không phù hợp bệnh tim mạch/mỡ máu: béo bão hòa ${fat.format()} g/100 g.")
-                    fat > SAT_FAT_MEDIUM -> warnings += caution("Bệnh tim mạch/mỡ máu nên hạn chế: béo bão hòa ${fat.format()} g/100 g.")
-                }
+        n.saturatedFat?.let { fat ->
+            when {
+                fat > SAT_FAT_HIGH -> flags += flag("Chất béo bão hòa", "Béo bão hòa cao: ${fat.fmt()} g/100 g.", if (cholesterol) Severity.HIGH else Severity.MEDIUM)
+                cholesterol && fat > SAT_FAT_MEDIUM -> flags += flag("Chất béo bão hòa", "Người mỡ máu/tim mạch nên hạn chế: ${fat.fmt()} g/100 g.", Severity.MEDIUM)
             }
         }
 
-        // 3. Dị ứng: so khớp từ khóa trong hồ sơ với allergens_tags của sản phẩm.
         val productAllergens = product.allergens.map { it.lowercase() }
-        ALLERGEN_KEYWORDS.forEach { (allergenTag, keywords) ->
-            val userHasAllergy = conditions.any { it.containsAny(keywords) }
-            val productContains = productAllergens.any { it.contains(allergenTag) }
-            if (userHasAllergy && productContains) {
-                warnings += avoid("Có chứa chất gây dị ứng: $allergenTag.")
+        val ingredientsText = product.ingredients.orEmpty().lowercase()
+        HealthKeywords.ALLERGENS.forEach { allergen ->
+            val userAllergic = allergies.containsAny(allergen.userTerms)
+            val inTags = productAllergens.any { it.contains(allergen.offTag) }
+            val inText = ingredientsText.containsAny(allergen.ingredientTerms)
+            if (userAllergic && (inTags || inText)) {
+                flags += flag(allergen.userTerms.first().replaceFirstChar { it.titlecase(Locale.ROOT) }, "Có chứa chất gây dị ứng bạn đã khai báo.", Severity.HIGH)
             }
         }
 
-        // 4. Năng lượng so với mục tiêu ngày.
-        val energy = nutrition.energyKcal
+        val energy = n.energyKcal
         if (profile != null && energy != null && profile.dailyCalorieTarget > 0) {
             val percent = (energy / profile.dailyCalorieTarget * 100).roundToInt()
             if (percent >= CALORIE_PERCENT_WARNING) {
-                warnings += caution("100 g sản phẩm cung cấp $percent% mục tiêu ${profile.dailyCalorieTarget} kcal/ngày.")
+                flags += flag("Năng lượng", "100 g cung cấp $percent% mục tiêu ${profile.dailyCalorieTarget} kcal/ngày.", Severity.LOW)
             }
         }
 
-        val verdict = when {
-            warnings.any { it.level == Verdict.AVOID } -> Verdict.AVOID
-            warnings.isNotEmpty() -> Verdict.CAUTION
-            else -> Verdict.SAFE
+        val rating = when {
+            flags.any { it.severity == Severity.HIGH } -> Rating.AVOID
+            flags.any { it.severity == Severity.MEDIUM } -> Rating.LIMIT
+            else -> Rating.SUITABLE
         }
-        return AnalysisResult(verdict = verdict, warnings = warnings)
+        val explanation = buildString {
+            append("Phân tích offline theo ngưỡng dinh dưỡng/100 g")
+            append(if (profile == null) " (chưa có hồ sơ sức khỏe). " else " và hồ sơ của bạn. ")
+            append(
+                when (rating) {
+                    Rating.SUITABLE -> "Không phát hiện vấn đề đáng kể."
+                    Rating.LIMIT -> "Có thể dùng nhưng nên hạn chế khẩu phần."
+                    Rating.AVOID -> "Không nên sử dụng với tình trạng sức khỏe hiện tại."
+                }
+            )
+        }
+        return LabelAnalysis(
+            productName = product.name,
+            ingredients = splitIngredients(product.ingredients),
+            rating = rating,
+            flaggedIngredients = flags.distinctBy { it.name to it.reason },
+            explanation = explanation,
+            mainIngredientEn = HealthKeywords.guessMainIngredient(product.name, product.ingredients)
+        )
     }
 
-    private fun caution(message: String) = AnalysisWarning(Verdict.CAUTION, message)
-    private fun avoid(message: String) = AnalysisWarning(Verdict.AVOID, message)
+    private fun flag(name: String, reason: String, severity: Severity) = FlaggedIngredient(name, reason, severity)
 
-    private fun String.containsAny(keywords: List<String>) = keywords.any { contains(it) }
-
-    private fun Double.format(): String =
-        if (this % 1.0 == 0.0) toInt().toString() else String.format(java.util.Locale.US, "%.1f", this)
+    private fun Double.fmt(): String =
+        if (this % 1.0 == 0.0) toInt().toString() else String.format(Locale.US, "%.1f", this)
 
     companion object {
         const val SUGAR_HIGH = 22.5
@@ -106,21 +106,11 @@ class NutritionAnalyzer {
         const val SALT_MEDIUM = 0.3
         const val CALORIE_PERCENT_WARNING = 20
 
-        val DIABETES_KEYWORDS = listOf("tiểu đường", "đái tháo đường", "diabetes")
-        val HYPERTENSION_KEYWORDS = listOf("huyết áp", "hypertension")
-        val HEART_KEYWORDS = listOf("tim mạch", "mỡ máu", "cholesterol", "heart")
-
-        /** allergen tag (Open Food Facts, đã bỏ tiền tố "en:") -> từ khóa người dùng nhập. */
-        val ALLERGEN_KEYWORDS: Map<String, List<String>> = mapOf(
-            "peanuts" to listOf("đậu phộng", "lạc", "peanut"),
-            "milk" to listOf("sữa", "lactose", "milk"),
-            "eggs" to listOf("trứng", "egg"),
-            "gluten" to listOf("gluten", "lúa mì", "wheat"),
-            "crustaceans" to listOf("hải sản", "tôm", "cua", "shellfish"),
-            "fish" to listOf("dị ứng cá", "fish"),
-            "soybeans" to listOf("đậu nành", "soy"),
-            "nuts" to listOf("hạt", "nuts"),
-            "sesame" to listOf("mè", "vừng", "sesame")
-        )
+        fun splitIngredients(text: String?): List<String> =
+            text.orEmpty()
+                .split(',', ';')
+                .map { it.trim().trimEnd('.') }
+                .filter { it.isNotEmpty() }
+                .take(60)
     }
 }

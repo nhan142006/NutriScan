@@ -1,174 +1,134 @@
 package vn.edu.vlu.milestone2.ui.profile
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import vn.edu.vlu.milestone2.data.repository.HealthProfile
+import vn.edu.vlu.milestone2.R
+import vn.edu.vlu.milestone2.data.model.HealthProfile
+import vn.edu.vlu.milestone2.data.repository.AuthRepository
 import vn.edu.vlu.milestone2.data.repository.HealthProfileRepository
+import vn.edu.vlu.milestone2.di.ServiceLocator
 
 data class ProfileFormState(
-    val id: Long = 0,
-    val fullName: String = "",
-    val age: String = "",
-    val dailyCalorieTarget: String = "2000",
-    val conditions: String = ""
-)
-
-data class ProfileUiState(
-    val profiles: List<HealthProfile> = emptyList(),
-    val form: ProfileFormState = ProfileFormState(),
-    val validationError: String? = null,
-    val message: String? = null,
+    val conditions: Set<String> = emptySet(),
+    val allergies: Set<String> = emptySet(),
+    @StringRes val nameError: Int? = null,
+    @StringRes val ageError: Int? = null,
+    @StringRes val calorieError: Int? = null,
     val isSaving: Boolean = false
 ) {
-    val isEditing: Boolean get() = form.id != 0L
+    /** Chip hiển thị = danh sách gợi ý sẵn + mục người dùng tự thêm. */
+    val conditionOptions: List<String> get() = (PRESET_CONDITIONS + conditions).distinct()
+    val allergyOptions: List<String> get() = (PRESET_ALLERGIES + allergies).distinct()
+
+    companion object {
+        val PRESET_CONDITIONS = listOf("Tiểu đường", "Cao huyết áp", "Mỡ máu cao", "Bệnh thận", "Gout")
+        val PRESET_ALLERGIES = listOf("Đậu phộng", "Sữa / Lactose", "Gluten", "Hải sản", "Trứng", "Đậu nành", "Hạt", "Mè")
+        val DIET_GOALS = listOf("Giữ cân", "Giảm cân", "Tăng cơ", "Ăn chay", "Ít đường", "Ít muối")
+    }
 }
 
+sealed interface ProfileEvent {
+    data object Saved : ProfileEvent
+    data object Deleted : ProfileEvent
+}
+
+/** ProfileViewModel – CRUD Hồ sơ sức khỏe (Room + đồng bộ Firestore). */
 class ProfileViewModel(
-    private val repository: HealthProfileRepository
+    private val profileRepository: HealthProfileRepository,
+    private val authRepository: AuthRepository
 ) : ViewModel() {
-    private val form = MutableStateFlow(ProfileFormState())
-    private val validationError = MutableStateFlow<String?>(null)
-    private val message = MutableStateFlow<String?>(null)
-    private val isSaving = MutableStateFlow(false)
 
-    val uiState: StateFlow<ProfileUiState> = combine(
-        repository.observeProfiles(),
-        form,
-        validationError,
-        message,
-        isSaving
-    ) { profiles, currentForm, currentError, currentMessage, saving ->
-        ProfileUiState(
-            profiles = profiles,
-            form = currentForm,
-            validationError = currentError,
-            message = currentMessage,
-            isSaving = saving
-        )
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5_000),
-        initialValue = ProfileUiState()
-    )
+    val profile: StateFlow<HealthProfile?> = profileRepository.observeCurrentProfile()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
-    fun updateFullName(value: String) = updateForm { copy(fullName = value) }
+    val accountEmail: String? get() = authRepository.currentUser?.email
 
-    fun updateAge(value: String) = updateForm { copy(age = value) }
+    private val _form = MutableStateFlow(ProfileFormState())
+    val form: StateFlow<ProfileFormState> = _form.asStateFlow()
 
-    fun updateDailyCalorieTarget(value: String) =
-        updateForm { copy(dailyCalorieTarget = value) }
+    private val _events = Channel<ProfileEvent>(Channel.BUFFERED)
+    val events: Flow<ProfileEvent> = _events.receiveAsFlow()
 
-    fun updateConditions(value: String) = updateForm { copy(conditions = value) }
+    private var loadedFromDb = false
 
-    fun editProfile(profile: HealthProfile) {
-        form.value = ProfileFormState(
-            id = profile.id,
-            fullName = profile.fullName,
-            age = profile.age.toString(),
-            dailyCalorieTarget = profile.dailyCalorieTarget.toString(),
-            conditions = profile.conditions.joinToString(", ")
-        )
-        validationError.value = null
-        message.value = null
+    /** Nạp lựa chọn từ hồ sơ đã lưu đúng 1 lần (không ghi đè khi người dùng đang sửa). */
+    fun onProfileLoaded(profile: HealthProfile?) {
+        if (loadedFromDb || profile == null) return
+        loadedFromDb = true
+        _form.update { it.copy(conditions = profile.conditions.toSet(), allergies = profile.allergies.toSet()) }
     }
 
-    fun createNewProfile() {
-        form.value = ProfileFormState()
-        validationError.value = null
-        message.value = null
+    fun toggleCondition(name: String, checked: Boolean) = _form.update {
+        it.copy(conditions = if (checked) it.conditions + name else it.conditions - name)
     }
 
-    fun saveProfile() {
-        val currentForm = form.value
-        val name = currentForm.fullName.trim()
-        val age = currentForm.age.toIntOrNull()
-        val calorieTarget = currentForm.dailyCalorieTarget.toIntOrNull()
+    fun toggleAllergy(name: String, checked: Boolean) = _form.update {
+        it.copy(allergies = if (checked) it.allergies + name else it.allergies - name)
+    }
 
-        val error = when {
-            name.isEmpty() -> "Vui lòng nhập họ và tên."
-            age == null || age !in 1..120 -> "Tuổi phải là số từ 1 đến 120."
-            calorieTarget == null || calorieTarget !in 500..10_000 ->
-                "Mục tiêu năng lượng phải từ 500 đến 10.000 kcal."
-            else -> null
-        }
-        if (error != null) {
-            validationError.value = error
-            message.value = null
-            return
-        }
-        val validatedAge = requireNotNull(age)
-        val validatedCalorieTarget = requireNotNull(calorieTarget)
+    fun addCustomCondition(text: String) {
+        val value = text.trim()
+        if (value.isNotEmpty()) toggleCondition(value, true)
+    }
 
+    fun addCustomAllergy(text: String) {
+        val value = text.trim()
+        if (value.isNotEmpty()) toggleAllergy(value, true)
+    }
+
+    fun save(name: String, ageText: String, calorieText: String, dietGoal: String) {
+        val age = ageText.trim().toIntOrNull()
+        val calories = calorieText.trim().toIntOrNull()
+        val nameError = if (name.isBlank()) R.string.profile_error_name else null
+        val ageError = if (age == null || age !in 1..120) R.string.profile_error_age else null
+        val calorieError = if (calories == null || calories !in 800..5000) R.string.profile_error_calories else null
+        _form.update { it.copy(nameError = nameError, ageError = ageError, calorieError = calorieError) }
+        if (nameError != null || ageError != null || calorieError != null) return
+
+        val state = _form.value
         viewModelScope.launch {
-            isSaving.value = true
-            validationError.value = null
-            runCatching {
-                repository.saveProfile(
-                    id = currentForm.id,
-                    fullName = name,
-                    age = validatedAge,
-                    dailyCalorieTarget = validatedCalorieTarget,
-                    conditions = currentForm.conditions.split(',', ';', '\n')
-                )
-            }.onSuccess {
-                form.value = ProfileFormState()
-                message.value = if (currentForm.id == 0L) {
-                    "Đã lưu hồ sơ vào bộ nhớ offline."
-                } else {
-                    "Đã cập nhật hồ sơ offline."
-                }
-            }.onFailure { throwable ->
-                validationError.value = throwable.message ?: "Không thể lưu hồ sơ."
-            }
-            isSaving.value = false
+            _form.update { it.copy(isSaving = true) }
+            profileRepository.saveProfile(
+                fullName = name,
+                age = age!!,
+                dietGoal = dietGoal,
+                dailyCalorieTarget = calories!!,
+                conditions = state.conditions.toList(),
+                allergies = state.allergies.toList()
+            )
+            _form.update { it.copy(isSaving = false) }
+            _events.send(ProfileEvent.Saved)
         }
     }
 
-    fun deleteCurrentProfile() {
-        val profileId = form.value.id
-        if (profileId == 0L) return
-
+    fun delete() {
         viewModelScope.launch {
-            isSaving.value = true
-            runCatching { repository.deleteProfile(profileId) }
-                .onSuccess { deleted ->
-                    if (deleted) {
-                        form.value = ProfileFormState()
-                        validationError.value = null
-                        message.value = "Đã xóa hồ sơ và các tình trạng liên quan."
-                    } else {
-                        validationError.value = "Hồ sơ không còn tồn tại."
-                    }
-                }
-                .onFailure { throwable ->
-                    validationError.value = throwable.message ?: "Không thể xóa hồ sơ."
-                }
-            isSaving.value = false
+            profileRepository.deleteProfile()
+            loadedFromDb = false
+            _form.value = ProfileFormState()
+            _events.send(ProfileEvent.Deleted)
         }
     }
 
-    private inline fun updateForm(transform: ProfileFormState.() -> ProfileFormState) {
-        form.value = form.value.transform()
-        validationError.value = null
-        message.value = null
-    }
-}
+    fun signOut() = authRepository.signOut()
 
-class ProfileViewModelFactory(
-    private val repository: HealthProfileRepository
-) : ViewModelProvider.Factory {
-    @Suppress("UNCHECKED_CAST")
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        require(modelClass.isAssignableFrom(ProfileViewModel::class.java)) {
-            "ViewModel không được hỗ trợ: ${modelClass.name}"
+    companion object {
+        val Factory: ViewModelProvider.Factory = viewModelFactory {
+            initializer { ProfileViewModel(ServiceLocator.healthProfileRepository, ServiceLocator.authRepository) }
         }
-        return ProfileViewModel(repository) as T
     }
 }

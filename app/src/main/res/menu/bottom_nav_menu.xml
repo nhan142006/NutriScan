@@ -1,18 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/healthProfileFragment"
-        android:title="Hồ sơ" />
+        android:id="@+id/homeFragment"
+        android:icon="@drawable/ic_home"
+        android:title="@string/nav_home" />
     <item
-        android:id="@+id/scannerFragment"
-        android:title="Tra cứu" />
+        android:id="@+id/scanHubFragment"
+        android:icon="@drawable/ic_barcode"
+        android:title="@string/nav_scan" />
     <item
-        android:id="@+id/cameraFragment"
-        android:title="Chụp ảnh" />
+        android:id="@+id/historyFragment"
+        android:icon="@drawable/ic_history"
+        android:title="@string/nav_history" />
     <item
-        android:id="@+id/analysisFragment"
-        android:title="Phân tích" />
+        android:id="@+id/recipesFragment"
+        android:icon="@drawable/ic_restaurant"
+        android:title="@string/nav_recipes" />
     <item
-        android:id="@+id/recipeFragment"
-        android:title="Gợi ý" />
+        android:id="@+id/profileFragment"
+        android:icon="@drawable/ic_person"
+        android:title="@string/nav_profile" />
 </menu>

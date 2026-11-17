@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_greeting">Xin chào, %1$s</string>
+    <string name="home_greeting_default">Xin chào!</string>
+    <string name="home_subtitle">Hôm nay bạn muốn kiểm tra sản phẩm nào?</string>
+    <string name="home_profile_title">Hồ sơ sức khỏe</string>
+    <string name="home_profile_missing">Chưa có hồ sơ – chạm để tạo, AI sẽ đánh giá chính xác hơn.</string>
+    <string name="home_profile_summary">Bệnh lý: %1$s\nDị ứng: %2$s · Mục tiêu: %3$s</string>
+    <string name="home_none">không có</string>
+    <string name="home_action_barcode">Quét mã vạch</string>
+    <string name="home_action_barcode_sub">Tra Open Food Facts</string>
+    <string name="home_action_label">Chụp nhãn</string>
+    <string name="home_action_label_sub">AI đọc thành phần</string>
+    <plurals name="home_pending">
+        <item quantity="one">%d ảnh nhãn đang chờ mạng để phân tích</item>
+        <item quantity="other">%d ảnh nhãn đang chờ mạng để phân tích</item>
+    </plurals>
+    <string name="home_ai_ready">Gemini AI đã sẵn sàng (structured JSON output).</string>
+    <string name="home_ai_missing">Chưa có GEMINI_API_KEY – mã vạch dùng phân tích offline, ảnh nhãn sẽ chờ.</string>
+    <string name="home_recent_title">Quét gần đây</string>
+    <string name="home_recent_empty">Chưa có lần quét nào. Hãy thử quét mã vạch đầu tiên!</string>
+    <string name="scan_source_barcode">Mã vạch</string>
+    <string name="scan_source_label">Ảnh nhãn</string>
+    <string name="scan_meta">%1$s · %2$s</string>
+</resources>

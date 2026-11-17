@@ -1,13 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <!-- Material 3 palette (seed #2E7D32 – xanh lá "dinh dưỡng") -->
+    <color name="md_primary">#2E6B30</color>
+    <color name="md_on_primary">#FFFFFF</color>
+    <color name="md_primary_container">#B1F2A8</color>
+    <color name="md_on_primary_container">#002204</color>
+    <color name="md_secondary">#52634F</color>
+    <color name="md_on_secondary">#FFFFFF</color>
+    <color name="md_secondary_container">#D5E8CF</color>
+    <color name="md_on_secondary_container">#101F0F</color>
+    <color name="md_tertiary">#38656A</color>
+    <color name="md_on_tertiary">#FFFFFF</color>
+    <color name="md_tertiary_container">#BCEBF0</color>
+    <color name="md_on_tertiary_container">#002023</color>
+    <color name="md_error">#BA1A1A</color>
+    <color name="md_on_error">#FFFFFF</color>
+    <color name="md_error_container">#FFDAD6</color>
+    <color name="md_on_error_container">#410002</color>
+    <color name="md_background">#F7FBF1</color>
+    <color name="md_on_background">#181D17</color>
+    <color name="md_surface">#F7FBF1</color>
+    <color name="md_on_surface">#181D17</color>
+    <color name="md_surface_variant">#DEE5D8</color>
+    <color name="md_on_surface_variant">#424940</color>
+    <color name="md_outline">#72796F</color>
+    <color name="md_outline_variant">#C2C9BD</color>
+    <color name="md_surface_container_lowest">#FFFFFF</color>
+    <color name="md_surface_container_low">#F1F5EB</color>
+    <color name="md_surface_container">#EBEFE6</color>
+    <color name="md_surface_container_high">#E6E9E0</color>
+    <color name="md_surface_container_highest">#E0E4DA</color>
+
+    <!-- Màu ngữ nghĩa cho đánh giá Suitable / Limit / Avoid -->
+    <color name="rating_suitable">#2E7D32</color>
+    <color name="rating_suitable_bg">#DFF3DC</color>
+    <color name="rating_limit">#B26A00</color>
+    <color name="rating_limit_bg">#FFEFD2</color>
+    <color name="rating_avoid">#C62828</color>
+    <color name="rating_avoid_bg">#FFE1DE</color>
+    <color name="rating_pending">#5C6BC0</color>
+    <color name="rating_pending_bg">#E3E6FA</color>
+
     <color name="status_error">#B3261E</color>
-    <color name="status_success">#2E7D32</color>
-    <color name="status_warning">#E65100</color>
-    <color name="verdict_safe_bg">#E8F5E9</color>
-    <color name="verdict_caution_bg">#FFF3E0</color>
-    <color name="verdict_avoid_bg">#FFEBEE</color>
     <color name="image_placeholder_tint">#9E9E9E</color>
-    <color name="error_banner_bg">#FDECEA</color>
+    <color name="scrim_dark">#99000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="black">#FF000000</color>
 </resources>

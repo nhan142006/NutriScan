@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="md_primary">#96D58E</color>
+    <color name="md_on_primary">#003A09</color>
+    <color name="md_primary_container">#14521A</color>
+    <color name="md_on_primary_container">#B1F2A8</color>
+    <color name="md_secondary">#B9CCB4</color>
+    <color name="md_on_secondary">#253423</color>
+    <color name="md_secondary_container">#3B4B38</color>
+    <color name="md_on_secondary_container">#D5E8CF</color>
+    <color name="md_tertiary">#A0CFD4</color>
+    <color name="md_on_tertiary">#00363B</color>
+    <color name="md_tertiary_container">#1E4D52</color>
+    <color name="md_on_tertiary_container">#BCEBF0</color>
+    <color name="md_error">#FFB4AB</color>
+    <color name="md_on_error">#690005</color>
+    <color name="md_error_container">#93000A</color>
+    <color name="md_on_error_container">#FFDAD6</color>
+    <color name="md_background">#10140F</color>
+    <color name="md_on_background">#E0E4DA</color>
+    <color name="md_surface">#10140F</color>
+    <color name="md_on_surface">#E0E4DA</color>
+    <color name="md_surface_variant">#424940</color>
+    <color name="md_on_surface_variant">#C2C9BD</color>
+    <color name="md_outline">#8C9388</color>
+    <color name="md_outline_variant">#424940</color>
+    <color name="md_surface_container_lowest">#0B0F0A</color>
+    <color name="md_surface_container_low">#181D17</color>
+    <color name="md_surface_container">#1C211B</color>
+    <color name="md_surface_container_high">#272B25</color>
+    <color name="md_surface_container_highest">#31362F</color>
+
+    <color name="rating_suitable">#8EDB87</color>
+    <color name="rating_suitable_bg">#1E3A1D</color>
+    <color name="rating_limit">#FFC56B</color>
+    <color name="rating_limit_bg">#3D2B0A</color>
+    <color name="rating_avoid">#FF9A90</color>
+    <color name="rating_avoid_bg">#4A1512</color>
+    <color name="rating_pending">#B4BCF5</color>
+    <color name="rating_pending_bg">#262B4A</color>
+</resources>

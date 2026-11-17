@@ -1,66 +1,96 @@
 package vn.edu.vlu.milestone2.di
 
 import android.content.Context
-import com.google.firebase.FirebaseApp
-import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.FirebaseAuth
-import kotlinx.coroutines.tasks.await
+import com.google.firebase.firestore.FirebaseFirestore
+import vn.edu.vlu.milestone2.BuildConfig
 import vn.edu.vlu.milestone2.core.network.NetworkModule
+import vn.edu.vlu.milestone2.core.network.NetworkMonitor
 import vn.edu.vlu.milestone2.data.local.NutriScanDatabase
+import vn.edu.vlu.milestone2.data.remote.gemini.GeminiDataSource
 import vn.edu.vlu.milestone2.data.repository.AuthRepository
-import vn.edu.vlu.milestone2.data.repository.DetailRepository
 import vn.edu.vlu.milestone2.data.repository.FirebaseAuthRepository
 import vn.edu.vlu.milestone2.data.repository.HealthProfileRepository
 import vn.edu.vlu.milestone2.data.repository.ProductRepository
 import vn.edu.vlu.milestone2.data.repository.RecipeRepository
-import vn.edu.vlu.milestone2.data.repository.SavedProductSession
+import vn.edu.vlu.milestone2.data.repository.ScanRepository
+import vn.edu.vlu.milestone2.data.storage.ScanImageStorage
+import vn.edu.vlu.milestone2.data.sync.ProfileCloudSync
 import vn.edu.vlu.milestone2.domain.NutritionAnalyzer
-import java.io.IOException
+import vn.edu.vlu.milestone2.domain.RecipeCompatibilityChecker
+import vn.edu.vlu.milestone2.work.ScanWorkScheduler
 
 /**
- * Dependency container thủ công (manual DI). Khởi tạo 1 lần trong [vn.edu.vlu.milestone2.NutriScanApp].
- * Activity/Fragment KHÔNG gọi API trực tiếp; chúng chỉ lấy ViewModel, ViewModel lấy Repository từ đây.
+ * Dependency container thủ công (manual DI), khởi tạo trong NutriScanApp.
+ * Fragment chỉ lấy ViewModel; ViewModel lấy Repository từ đây – không ViewModel nào giữ Context.
  */
 object ServiceLocator {
 
     private lateinit var appContext: Context
 
     fun init(context: Context) {
-        appContext = context.applicationContext
+        if (!::appContext.isInitialized) appContext = context.applicationContext
     }
 
-    private val networkModule: NetworkModule by lazy { NetworkModule(appContext) }
+    private val database by lazy { NutriScanDatabase.getInstance(appContext) }
+    private val networkModule by lazy { NetworkModule(appContext) }
+
+    val networkMonitor: NetworkMonitor by lazy { NetworkMonitor(appContext) }
+
+    val authRepository: AuthRepository by lazy { FirebaseAuthRepository(FirebaseAuth.getInstance()) }
+
+    private val geminiDataSource by lazy {
+        GeminiDataSource(
+            api = networkModule.geminiApi,
+            gson = networkModule.gson,
+            apiKey = BuildConfig.GEMINI_API_KEY,
+            model = BuildConfig.GEMINI_MODEL
+        )
+    }
+
+    val isAiConfigured: Boolean get() = BuildConfig.GEMINI_API_KEY.isNotBlank()
+
+    val healthProfileRepository: HealthProfileRepository by lazy {
+        HealthProfileRepository(
+            dao = database.healthProfileDao(),
+            authRepository = authRepository,
+            cloudSync = ProfileCloudSync { FirebaseFirestore.getInstance() }
+        )
+    }
 
     val productRepository: ProductRepository by lazy {
-        ProductRepository(networkModule.openFoodFactsApi)
+        ProductRepository(
+            api = networkModule.openFoodFactsApi,
+            productDao = database.productDao(),
+            favoriteDao = database.favoriteDao(),
+            gson = networkModule.gson
+        )
     }
 
-    internal val detailRepository: DetailRepository by lazy {
-        DetailRepository(productRepository, networkModule.savedProductApi, ::savedProductSession)
-    }
-
-    private suspend fun savedProductSession(): SavedProductSession? {
-        val user = FirebaseAuth.getInstance().currentUser ?: return null
-        val project = checkNotNull(FirebaseApp.getInstance().options.projectId)
-        val token = try {
-            user.getIdToken(false).await().token ?: return null
-        } catch (error: FirebaseNetworkException) {
-            throw IOException(error)
-        }
-        return SavedProductSession(project, user.uid, "Bearer $token")
+    val scanRepository: ScanRepository by lazy {
+        ScanRepository(
+            scanDao = database.scanResultDao(),
+            gemini = geminiDataSource,
+            analyzer = NutritionAnalyzer(),
+            imageStorage = imageStorage,
+            scheduler = ScanWorkScheduler(appContext),
+            profileRepository = healthProfileRepository,
+            gson = networkModule.gson
+        )
     }
 
     val recipeRepository: RecipeRepository by lazy {
-        RecipeRepository(networkModule.mealDbApi)
+        RecipeRepository(
+            api = networkModule.mealDbApi,
+            recipeDao = database.recipeDao(),
+            gemini = geminiDataSource,
+            profileRepository = healthProfileRepository,
+            scanRepository = scanRepository,
+            gson = networkModule.gson
+        )
     }
 
-    val healthProfileRepository: HealthProfileRepository by lazy {
-        HealthProfileRepository(NutriScanDatabase.getInstance(appContext).healthProfileDao())
-    }
+    val imageStorage: ScanImageStorage by lazy { ScanImageStorage(appContext) }
 
-    val authRepository: AuthRepository by lazy {
-        FirebaseAuthRepository(FirebaseAuth.getInstance())
-    }
-
-    val nutritionAnalyzer: NutritionAnalyzer by lazy { NutritionAnalyzer() }
+    val compatibilityChecker: RecipeCompatibilityChecker by lazy { RecipeCompatibilityChecker() }
 }

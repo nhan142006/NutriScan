@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="scan_hub_title">Quét sản phẩm</string>
+    <string name="scan_hub_intro">Quét mã vạch để tra Open Food Facts. Sản phẩm Việt Nam chưa có dữ liệu? Hãy chụp nhãn thành phần để AI phân tích.</string>
+    <string name="scan_hub_manual_title">Nhập thủ công</string>
+    <string name="scan_hub_barcode_hint">Mã vạch (8–14 chữ số)</string>
+    <string name="scan_hub_barcode_invalid">Mã vạch chỉ gồm 8 đến 14 chữ số.</string>
+    <string name="scan_hub_lookup">Tra cứu</string>
+    <string name="scan_hub_search_hint">Tìm theo tên (ví dụ: vinamilk)</string>
+    <string name="scan_hub_search_empty">Không tìm thấy sản phẩm phù hợp.</string>
+    <string name="nutriscore_label">Nutri-Score %1$s</string>
+    <string name="nutriscore_unknown">Chưa có Nutri-Score</string>
+    <string name="product_brand_barcode">%1$s · %2$s</string>
+
+    <string name="barcode_title">Quét mã vạch</string>
+    <string name="barcode_hint">Đưa mã vạch vào trong khung</string>
+    <string name="barcode_fallback">Không có mã? Chụp nhãn</string>
+    <string name="camera_title">Chụp nhãn thành phần</string>
+    <string name="camera_tip">Chụp rõ, đủ sáng toàn bộ phần \"Thành phần\"</string>
+    <string name="camera_status_ready">Nhấn nút để chụp</string>
+    <string name="camera_status_saving">Đang nén ảnh (&lt; 1 MB)…</string>
+    <string name="camera_capture">Chụp ảnh</string>
+    <string name="camera_torch">Đèn flash</string>
+    <string name="camera_permission_denied">NutriScan cần quyền Camera để quét. Hãy cấp quyền trong Cài đặt.</string>
+    <string name="camera_error">Không thể chụp ảnh. Vui lòng thử lại.</string>
+    <string name="camera_unavailable">Không khởi động được camera.</string>
+</resources>

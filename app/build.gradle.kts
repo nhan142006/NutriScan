@@ -1,14 +1,19 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.ksp)
     alias(libs.plugins.google.services)
 }
 
-// Cho phep du an van build truoc khi thanh vien them file cau hinh Firebase.
-// Plugin se tu dong duoc ap dung ngay khi app/google-services.json ton tai.
-if (file("google-services.json").exists()) {
-    apply(plugin = "com.google.gms.google-services")
+// API key không bao giờ commit lên Git: đọc từ local.properties (đã nằm trong .gitignore).
+// Thêm dòng sau vào local.properties:  GEMINI_API_KEY=your_key_here
+val localProperties = Properties().apply {
+    val file = rootProject.file("local.properties")
+    if (file.exists()) file.inputStream().use { load(it) }
 }
+val geminiApiKey: String = localProperties.getProperty("GEMINI_API_KEY", "")
+val geminiModel: String = localProperties.getProperty("GEMINI_MODEL", "gemini-2.5-flash")
 
 android {
     namespace = "vn.edu.vlu.milestone2"
@@ -18,23 +23,21 @@ android {
         applicationId = "vn.edu.vlu.milestone2"
         minSdk = 24
         targetSdk = 37
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "2.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        // Public HTTPS REST endpoints (Milestone 04 - Network Layer)
         buildConfigField("String", "OPEN_FOOD_FACTS_BASE_URL", "\"https://world.openfoodfacts.org/\"")
         buildConfigField("String", "MEAL_DB_BASE_URL", "\"https://www.themealdb.com/api/json/v1/1/\"")
+        buildConfigField("String", "GEMINI_BASE_URL", "\"https://generativelanguage.googleapis.com/\"")
+        buildConfigField("String", "GEMINI_API_KEY", "\"$geminiApiKey\"")
+        buildConfigField("String", "GEMINI_MODEL", "\"$geminiModel\"")
     }
 
     buildTypes {
         release {
             isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
         }
     }
 
@@ -54,45 +57,54 @@ ksp {
 }
 
 dependencies {
-    implementation(libs.androidx.activity.ktx)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.androidx.constraintlayout)
+    // AndroidX + Material 3
     implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.activity.ktx)
+    implementation(libs.androidx.fragment.ktx)
+    implementation(libs.material)
+    implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.recyclerview)
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
-    implementation(libs.material)
+
+    // MVVM (Milestone 2)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.lifecycle.livedata.ktx)
+
+    // Room (Milestone 07)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
-firebase-authentication
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.auth)
 
-    implementation(libs.androidx.lifecycle.viewmodel.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.recyclerview)
-
-    // Milestone 04 - Network layer (Retrofit + OkHttp + Coroutines)
+    // Network (Milestone 04): Retrofit + OkHttp + Gson
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.gson)
     implementation(libs.okhttp.logging.interceptor)
 
-    // Milestone 04 - Asynchronous image loading
+    // Image loading (Milestone 04)
     implementation(libs.glide)
 
-    // Milestone 04 - Firebase Authentication
+    // Firebase Auth + Firestore (Milestone 04 + proposal 3.1)
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)
+    implementation(libs.firebase.firestore)
     implementation(libs.kotlinx.coroutines.play.services)
-main
 
-    // Thư viện hỗ trợ hàm by viewModels() trong Fragment
-    implementation("androidx.fragment:fragment-ktx:1.8.5")
+    // CameraX + ML Kit + WorkManager (proposal 3.2 / 3.3 / 4.4)
+    implementation(libs.androidx.camera.core)
+    implementation(libs.androidx.camera.camera2)
+    implementation(libs.androidx.camera.lifecycle)
+    implementation(libs.androidx.camera.view)
+    implementation(libs.mlkit.barcode.scanning)
+    implementation(libs.androidx.work.runtime.ktx)
+    implementation(libs.androidx.exifinterface)
 
     testImplementation(libs.junit)
-    testImplementation(libs.okhttp.mockwebserver)
     testImplementation(libs.kotlinx.coroutines.test)
-    androidTestImplementation(libs.androidx.espresso.core)
+    testImplementation(libs.okhttp.mockwebserver)
     androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.room.testing)
 }

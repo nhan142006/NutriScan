@@ -17,6 +17,10 @@ interface MealDbApi {
     @GET("filter.php")
     suspend fun filterByCategory(@Query("c") category: String): MealsResponseDto
 
+    /** GET filter.php?i={ingredient} - món theo nguyên liệu chính (lấy từ ScanResult gần đây). */
+    @GET("filter.php")
+    suspend fun filterByIngredient(@Query("i") ingredient: String): MealsResponseDto
+
     /** GET search.php?s={query} - tìm món theo tên. */
     @GET("search.php")
     suspend fun searchMeals(@Query("s") query: String): MealsResponseDto

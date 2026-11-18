@@ -35,7 +35,7 @@ def test_stats(files):
         node = ET.parse(path).getroot()
         for key in result:
             result[key] += int(node.get(key, 0))
-    if not result["tests"] or result["failures"] or result["errors"]:
+    if not result["tests"] or result["failures"] or result["errors"] or result["skipped"]:
         raise RuntimeError(f"Missing or failing verification: {result}")
     return result
 
@@ -77,11 +77,27 @@ def main():
     with zipfile.ZipFile(apk) as archive:
         provenance = archive.read("META-INF/version-control-info.textproto").decode()
         revision = re.search(r'revision: "([a-f0-9]+)"', provenance).group(1)
+    head = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
+    author = subprocess.check_output(["git", "log", "-1", "--format=%an <%ae>"], cwd=ROOT, text=True).strip()
+    committer = subprocess.check_output(["git", "log", "-1", "--format=%cn <%ce>"], cwd=ROOT, text=True).strip()
+    with zipfile.ZipFile(OUT / "Group04_NutriScan_Milestone05_Source.zip") as archive:
+        source_revision = archive.comment.decode().strip()
+    if revision != head or source_revision != head:
+        raise RuntimeError("APK, source archive and current Git revision must match")
+    walkthrough = json.loads((EVIDENCE/"release/walkthrough.json").read_text())
+    session = json.loads((EVIDENCE/"release/session-storage.json").read_text())
+    video = json.loads((EVIDENCE/"release/video-metadata.json").read_text())
+    if not 60 <= video["duration_seconds"] <= 180:
+        raise RuntimeError("Submission demo must last 1–3 minutes")
+    if session.get("fields_after_release_logout") != 0 or not session.get("plaintext_jwt_absent"):
+        raise RuntimeError("Missing signed-Release session storage/logout verification")
     apk_hash = hashlib.sha256(apk.read_bytes()).hexdigest()
     info = {"package": "vn.edu.vlu.milestone2", "versionName": "2.0.1", "versionCode": 3,
-            "source_revision": revision, "baseline_revision": "c11cab7703b3990ca2bf7844aad275fa45718b19",
+            "source_revision": revision, "source_author": author, "source_committer": committer,
+            "baseline_revision": "c11cab7703b3990ca2bf7844aad275fa45718b19",
             "apk_sha256": apk_hash, "certificate_sha256": cert, "unit_tests": unit,
-            "device_tests": device, "lint": lint,
+            "device_tests": device, "lint": lint, "release_walkthrough": walkthrough,
+            "release_session_storage": session, "video": video,
             "frames": {label: {w: frame_stats(label, w) for w in ("product", "recipe")}
                        for label in ("baseline-main-host", "release")}}
     (OUT / "VERIFICATION.json").write_text(json.dumps(info, indent=2), encoding="utf-8")
@@ -134,11 +150,12 @@ def main():
     table([["Nội dung", "Bằng chứng thực tế"],
            ["Baseline", "c11cab7 — PR #6, full UI milestones"],
            ["Source revision trong APK", revision],
+           ["Git author / committer", author if author == committer else f"{author}; {committer}"],
            ["Build", "APK/AAB Release có R8 + shrink resources + signing riêng"],
            ["JVM / thiết bị", f"{unit['tests']} unit tests; {device['tests']} device tests; failures/errors = 0; skipped = {device['skipped']}"],
            ["Lint Debug / Release", f"0 errors; warnings {lint['debug']['warnings']} / {lint['release']['warnings']}"],
            ["Kích thước", f"APK {apk.stat().st_size/1048576:.2f} MiB; AAB {bundle.stat().st_size/1048576:.2f} MiB"],
-           ["Chữ ký", "Dedicated RSA 3072-bit key, CN=NutriScan Group 04; verified with apksigner"]], [150, 360])
+           ["Chữ ký", "Dedicated RSA 3072-bit key, CN=NutriScan Group 04; APK: apksigner; AAB: jarsigner; cùng certificate"]], [150, 360])
     add("APK SHA-256", "Heading2")
     add(apk_hash[:32]+"<br/>"+apk_hash[32:], "CodeM05")
     add("Certificate SHA-256", "Heading2")
@@ -155,6 +172,7 @@ def main():
            ["Signing", "Khóa mới trong .signing/; không dùng debug key, không có unsigned fallback. APK/AAB ký tự động khi build." ]], [120,390])
     add("BuildConfig không làm API key không thể trích xuất từ APK. Không đưa real key, keystore hay password vào Git. Firebase SDK tự quản lý phiên của SDK; cache mã hóa của app không thay thế cơ chế đó.")
     add("EncryptedSharedPreferences hiện deprecated trong AndroidX, được cô lập sau SessionTokenStore vì đề bài yêu cầu rõ API này. Chỉ Debug tích hợp LeakCanary; Release không mang công cụ dò leak và không bật debuggable.")
+    add("Kiểm tra chính APK Release: 4 trường của app được mã hóa; không có khóa plaintext UID/token hoặc JWT plaintext. Sau bấm Đăng xuất: 0 trường phiên của app còn lại, UI quay về Login. File session-storage.json chỉ chứa số lượng và boolean, không chứa token.", "SmallM05")
     mapping = ROOT / "app/build/outputs/mapping/release/mapping.txt"
     kept = []
     with mapping.open(encoding="utf-8") as source:
@@ -175,7 +193,8 @@ def main():
             f = info["frames"][label][work]
             rows.append([work, name, f["frames"], f["janky"], f"{f['p50']} / {f['p95']}"])
     table(rows, [65,120,50,140,135])
-    add("Thay đổi: listener của ViewHolder chỉ gắn một lần; recycle xóa model/image; Fragment detach adapter; Glide cache giữ nguyên; JSON mapping chuyển sang I/O. Gfxinfo và Perfetto traces được giữ trong evidence/.")
+    add("Thay đổi: listener của ViewHolder chỉ gắn một lần; recycle xóa model/image; Fragment detach adapter; Glide cache giữ nguyên; JSON mapping chuyển sang I/O. Gfxinfo và Perfetto trace được giữ trong evidence/. Trace ghi workload sản phẩm và chuyển màn hình; số đo công thức lấy riêng từ gfxinfo, không suy diễn từ trace đó.")
+    add("Kết quả hỗn hợp: danh sách sản phẩm giảm tỷ lệ jank; danh sách công thức trong mẫu Release này có tỷ lệ jank cao hơn baseline. Vì vậy chưa xác nhận đạt mục tiêu cuộn 60 fps ổn định. Giữ nguyên số đo và công khai giới hạn thay vì chọn mẫu đẹp hơn.")
     add("Đây là so sánh bản nền Debug với bản shipping Release trên cùng fixture/GPU, không phải benchmark A/B riêng từng tối ưu. Không suy diễn thành cam kết 60 fps trên mọi thiết bị; các frame chậm còn lại phải được đọc theo số đo trên.")
     images([(EVIDENCE/"release/product-scroll.png", "Release: 80 cached product fixtures"),
             (EVIDENCE/"release/recipe-scroll.png", "Release: horizontal recipe RecyclerView")])
@@ -196,7 +215,7 @@ def main():
             (EVIDENCE/"release/session-restored.png", "Signed Release: session restored after force-stop")])
 
     page("Signed Release Functional Walkthrough")
-    add("Video mới quay chính APK Release 2.0.1 đã ký; APK_SIGNATURE.txt, VERIFICATION.json và metadata thiết bị đi kèm. Fixture được dùng để kiểm tra UI/offline/serialization, không giả làm kết quả API live.")
+    add(f"Video mới dài {video['duration_seconds']:.1f} giây, quay chính APK Release 2.0.1 đã ký; APK_SIGNATURE.txt, VERIFICATION.json và metadata thiết bị đi kèm. Đã kiểm tra lưu profile, yêu thích, đọc JSON sau R8, phân tích offline, tạo/xem công thức và checklist nấu ăn. Fixture không giả làm kết quả API live.")
     images([(EVIDENCE/"release/home.png", "A · Firebase login, current main Home"),
             (EVIDENCE/"release/product-detail.png", "B · Cached product/nutrition after R8"),
             (EVIDENCE/"release/cooking.png", "C · Offline cooking flow")])
@@ -207,9 +226,10 @@ def main():
     page("WBS, Provenance & Submission")
     table([["Thành viên / phạm vi", "Bằng chứng Git hoặc công việc thực tế"],
            ["Nguyễn Gia Thành — baseline", "d4c4b50, b376e76, 2b117fc, 97c5296, 05d3ae8: build/data/UI/test/schema nền main 2.0."],
-           ["Nguyễn Thành Trí — baseline", "21b0b79, ae982f2, 2b06278: Room/Auth và merge. M05 trong phiên này được thực hiện theo yêu cầu với Codex hỗ trợ; xem AI_USAGE.md và source diff."],
+           ["Nguyễn Thành Trí — baseline", "21b0b79, ae982f2, 2b06278: Room/Auth và merge trước M05; giữ nguyên tác giả của lịch sử main."],
            ["Nguyễn Trần Hoàng Nhân — baseline", "c67977f, efa6e08: details/network và giải quyết merge trước khi tích hợp UI mới."],
-           ["Phạm Thị Khánh Ngân", "Không gán commit/công việc M05 chưa được xác nhận. Nhóm cần bổ sung phần đóng góp thực tế ngoài Git nếu có."]], [175,335])
+           ["Phạm Thị Khánh Ngân", "Phần công việc thủ công ngoài Git cần nhóm xác nhận; không suy diễn khối lượng cá nhân từ tên tài khoản Git."]], [175,335])
+    add(f"Danh tính Git của commit M05: {author}. Người dùng đã chọn tài khoản Ngan3112 và yêu cầu đổi author/committer cho các commit M05 chưa push. Các tác giả baseline được giữ nguyên. Xem AI_USAGE.md để phân biệt danh tính Git với phần triển khai có Codex hỗ trợ.")
     add("Các phần M05 được Codex hỗ trợ gồm code security/performance/signing, test, emulator measurements, đóng gói và báo cáo. Không khai một tỷ lệ AI sử dụng chưa được nhóm đánh giá.")
     add("Bộ nộp", "Heading2")
     add("PDF này · signed APK/AAB · AI_USAGE.md · demo MP4 · source ZIP · SHA256SUMS.txt · public signing certificate · evidence đã loại dữ liệu nhạy cảm. Không đưa .signing/, local.properties, raw heap hoặc database người dùng vào bộ nộp.")

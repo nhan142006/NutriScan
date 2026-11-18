@@ -49,6 +49,21 @@ GitHub publication/tag creation is the final external step and requires an expli
 
 Historical WBS evidence must retain the distinction between baseline code and new M05 work. Source commit logs show Gia Thanh's UI/data/test integration, Thành Trí's Room/Auth work and Hoàng Nhân's details/network integration. Do not assign unrecorded M05 work to another member without confirmation.
 
+For this publication, the user selected `Ngan3112` and explicitly requested that
+the unpublished M05 commits use `Ngan3112 <189885155+Ngan3112@users.noreply.github.com>`
+as author and committer. Main's historical authors are preserved. AI_USAGE.md
+records Codex assistance; Git authorship is not presented as proof of manual work.
+
+## Recorded verification — 18 November 2026
+
+- JVM: **25 passed**, device: **6 passed**, no failures/errors/skips. Lint: zero errors; warnings are reported rather than hidden.
+- Actual signed Release walkthrough: profile save, cached nutrition after R8, favorite remove/add, offline analysis, user recipe create/read and cooking checklist. Video duration: **141.8646 seconds**.
+- Release storage inspection exported only counts/booleans: four encrypted app-owned session entries, no plaintext preference keys/JWT; after the UI logout, zero session entries remain and Login is shown. Firebase SDK persistence remains a separate SDK concern.
+- On the same Pixel 6 API 37 host-GPU emulator with the same fixtures, product jank was 20.83% on main Debug and 18.16% on M05 Release. Recipe jank was 25.29% and 49.48%, respectively. This finite comparison does **not** establish stable 60 fps or an improvement for recipes. Report the regression and measurement limits explicitly.
+- Heap instance summaries and a ten-round-trip collectability test found no retained destroyed product views in the tested workload. This is not a global proof of zero leaks.
+- No real Gemini key is configured in this environment. Offline fallback is verified; online image/Gemini processing is not yet verified.
+- The PDF reads test XML, APK/source revision metadata, signature evidence, frame data, walkthrough and duration metadata. It refuses missing/failed/skipped tests or mismatched source revisions. APK and AAB certificates must match during packaging.
+
 ## References
 
 - [Android R8 optimization](https://developer.android.com/topic/performance/app-optimization/enable-app-optimization)

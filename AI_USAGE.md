@@ -20,6 +20,13 @@ Historical contributor claims are based on Git history, not invented Milestone 0
 No numerical AI-usage percentage is claimed: the team must assess it against its course policy.
 GitHub publication requires a fresh account choice under the user's AGENTS.md instructions.
 
+For this Milestone 05 publication, the user explicitly selected GitHub account
+`Ngan3112` and requested that both author and committer of the unpublished M05
+commits use that identity. The verified GitHub noreply address is
+`189885155+Ngan3112@users.noreply.github.com`. Historical main commits retain
+their original authors. This Git identity choice does not claim that the account
+holder manually performed work generated or verified with Codex assistance.
+
 ---
 
 # Archived Milestone 04: Network Layer, RESTful API & Cloud Services Integration

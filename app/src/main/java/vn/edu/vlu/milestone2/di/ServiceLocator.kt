@@ -4,6 +4,7 @@ import android.content.Context
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import vn.edu.vlu.milestone2.BuildConfig
+import vn.edu.vlu.milestone2.R
 import vn.edu.vlu.milestone2.core.network.NetworkModule
 import vn.edu.vlu.milestone2.core.network.NetworkMonitor
 import vn.edu.vlu.milestone2.data.local.NutriScanDatabase
@@ -15,6 +16,7 @@ import vn.edu.vlu.milestone2.data.repository.ProductRepository
 import vn.edu.vlu.milestone2.data.repository.RecipeRepository
 import vn.edu.vlu.milestone2.data.repository.ScanRepository
 import vn.edu.vlu.milestone2.data.storage.ScanImageStorage
+import vn.edu.vlu.milestone2.data.security.EncryptedSessionStore
 import vn.edu.vlu.milestone2.data.sync.ProfileCloudSync
 import vn.edu.vlu.milestone2.domain.NutritionAnalyzer
 import vn.edu.vlu.milestone2.domain.RecipeCompatibilityChecker
@@ -37,7 +39,9 @@ object ServiceLocator {
 
     val networkMonitor: NetworkMonitor by lazy { NetworkMonitor(appContext) }
 
-    val authRepository: AuthRepository by lazy { FirebaseAuthRepository(FirebaseAuth.getInstance()) }
+    val authRepository: AuthRepository by lazy {
+        FirebaseAuthRepository(FirebaseAuth.getInstance(), EncryptedSessionStore(appContext))
+    }
 
     private val geminiDataSource by lazy {
         GeminiDataSource(
@@ -54,7 +58,12 @@ object ServiceLocator {
         HealthProfileRepository(
             dao = database.healthProfileDao(),
             authRepository = authRepository,
-            cloudSync = ProfileCloudSync { FirebaseFirestore.getInstance() }
+            cloudSync = ProfileCloudSync(
+                firestore = { FirebaseFirestore.getInstance() },
+                profileApi = networkModule.profileApi,
+                projectId = appContext.getString(R.string.project_id),
+                tokenProvider = authRepository::getIdToken
+            )
         )
     }
 

@@ -3,7 +3,9 @@ package vn.edu.vlu.milestone2.data.repository
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import vn.edu.vlu.milestone2.core.network.NetworkError
 import vn.edu.vlu.milestone2.core.network.NetworkResult
@@ -71,7 +73,10 @@ class RecipeRepository(
     }
 
     /** "Dành cho bạn": Gemini (profile + scans) + TheMealDB lọc theo nguyên liệu đã quét. */
-    suspend fun loadForYou(focusScanId: Long?): ForYouResult {
+    suspend fun loadForYou(focusScanId: Long?): ForYouResult =
+        withContext(ioDispatcher) { loadForYouOnIo(focusScanId) }
+
+    private suspend fun loadForYouOnIo(focusScanId: Long?): ForYouResult {
         val query = buildQuery(focusScanId)
 
         val matches = query.mainIngredient?.let { ingredient ->
@@ -114,12 +119,12 @@ class RecipeRepository(
 
     /** Gợi ý AI đã cache trong Room – vẫn xem được khi offline. */
     fun observeCachedAiSuggestions(): Flow<List<Recipe>> =
-        recipeDao.observeAiSuggestions(AI_CACHE_LIMIT).map { list -> list.map { it.toDomain(gson) } }
+        recipeDao.observeAiSuggestions(AI_CACHE_LIMIT).map { list -> list.map { it.toDomain(gson) } }.flowOn(ioDispatcher)
 
     fun observeMyRecipes(): Flow<List<Recipe>> =
-        recipeDao.observeMyRecipes().map { list -> list.map { it.toDomain(gson) } }
+        recipeDao.observeMyRecipes().map { list -> list.map { it.toDomain(gson) } }.flowOn(ioDispatcher)
 
-    fun observeRecipe(id: String): Flow<Recipe?> = recipeDao.observe(id).map { it?.toDomain(gson) }
+    fun observeRecipe(id: String): Flow<Recipe?> = recipeDao.observe(id).map { it?.toDomain(gson) }.flowOn(ioDispatcher)
 
     suspend fun getCategories(): NetworkResult<List<RecipeCategory>> =
         safeApiCall(ioDispatcher) { api.getCategories() }.map { response ->
@@ -142,7 +147,9 @@ class RecipeRepository(
             .map { response -> response.meals.orEmpty().mapNotNull { it.toSummaryOrNull() } }
 
     /** Cache-first: món đã lưu/AI/tự tạo đọc từ Room; món TheMealDB lấy API rồi cache để nấu offline. */
-    suspend fun loadRecipe(id: String): NetworkResult<Recipe> {
+    suspend fun loadRecipe(id: String): NetworkResult<Recipe> = withContext(ioDispatcher) { loadRecipeOnIo(id) }
+
+    private suspend fun loadRecipeOnIo(id: String): NetworkResult<Recipe> {
         recipeDao.get(id)?.let { return NetworkResult.Success(it.toDomain(gson)) }
         val result = safeApiCall(ioDispatcher) { api.lookupMeal(id) }
         return when (result) {
@@ -168,7 +175,7 @@ class RecipeRepository(
         category: String?,
         ingredients: List<String>,
         steps: List<String>
-    ): String {
+    ): String = withContext(ioDispatcher) {
         val recipeId = id ?: ("user_" + UUID.randomUUID().toString())
         val existing = id?.let { recipeDao.get(it) }
         recipeDao.upsert(
@@ -187,7 +194,7 @@ class RecipeRepository(
                 updatedAt = System.currentTimeMillis()
             ).toEntity(gson)
         )
-        return recipeId
+        recipeId
     }
 
     suspend fun deleteRecipe(id: String) {

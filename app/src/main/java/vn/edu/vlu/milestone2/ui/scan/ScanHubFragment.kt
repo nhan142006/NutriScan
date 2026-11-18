@@ -63,6 +63,7 @@ class ScanHubFragment : Fragment() {
     }
 
     override fun onDestroyView() {
+        _binding?.recyclerResults?.adapter = null
         super.onDestroyView()
         _binding = null
     }

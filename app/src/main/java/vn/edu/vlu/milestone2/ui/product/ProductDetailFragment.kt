@@ -13,6 +13,7 @@ import vn.edu.vlu.milestone2.core.network.NetworkError
 import vn.edu.vlu.milestone2.core.ui.UiState
 import vn.edu.vlu.milestone2.core.ui.collectWithLifecycle
 import vn.edu.vlu.milestone2.core.ui.loadImage
+import vn.edu.vlu.milestone2.core.ui.clearImage
 import vn.edu.vlu.milestone2.core.ui.showSnackbar
 import vn.edu.vlu.milestone2.core.ui.showState
 import vn.edu.vlu.milestone2.core.ui.toUserMessage
@@ -120,6 +121,7 @@ class ProductDetailFragment : Fragment() {
     }
 
     override fun onDestroyView() {
+        _binding?.imageProduct?.clearImage()
         super.onDestroyView()
         _binding = null
     }

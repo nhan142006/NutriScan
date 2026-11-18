@@ -1,7 +1,11 @@
 package vn.edu.vlu.milestone2.data.repository
 
 import com.google.gson.Gson
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import vn.edu.vlu.milestone2.core.network.NetworkError
 import vn.edu.vlu.milestone2.core.network.NetworkResult
@@ -29,7 +33,8 @@ class ScanRepository(
     private val imageStorage: ScanImageStorage,
     private val scheduler: ScanWorkScheduler,
     private val profileRepository: HealthProfileRepository,
-    private val gson: Gson
+    private val gson: Gson,
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) {
 
     enum class WorkOutcome { SUCCESS, RETRY, FAILED }
@@ -37,25 +42,28 @@ class ScanRepository(
     /** Kết quả phân tích sản phẩm theo mã vạch. [usedAi] = false khi phải dùng luật offline. */
     data class ProductAnalysis(val scanId: Long, val usedAi: Boolean, val aiError: NetworkError?)
 
-    fun observeHistory(): Flow<List<ScanResult>> = scanDao.observeAll().map { it.map(::mapScan) }
+    fun observeHistory(): Flow<List<ScanResult>> = scanDao.observeAll().map { it.map(::mapScan) }.flowOn(ioDispatcher)
 
-    fun observeRecent(limit: Int): Flow<List<ScanResult>> = scanDao.observeRecent(limit).map { it.map(::mapScan) }
+    fun observeRecent(limit: Int): Flow<List<ScanResult>> = scanDao.observeRecent(limit).map { it.map(::mapScan) }.flowOn(ioDispatcher)
 
-    fun observeScan(scanId: Long): Flow<ScanResult?> = scanDao.observe(scanId).map { it?.let(::mapScan) }
+    fun observeScan(scanId: Long): Flow<ScanResult?> = scanDao.observe(scanId).map { it?.let(::mapScan) }.flowOn(ioDispatcher)
 
     fun observePendingCount(): Flow<Int> = scanDao.observeCount(ScanStatus.PENDING)
 
-    suspend fun getScan(scanId: Long): ScanResult? = scanDao.get(scanId)?.let(::mapScan)
+    suspend fun getScan(scanId: Long): ScanResult? = withContext(ioDispatcher) { scanDao.get(scanId)?.let(::mapScan) }
 
-    suspend fun getRecentUsable(limit: Int): List<ScanResult> = scanDao.getRecentUsable(limit).map(::mapScan)
+    suspend fun getRecentUsable(limit: Int): List<ScanResult> = withContext(ioDispatcher) { scanDao.getRecentUsable(limit).map(::mapScan) }
 
-    suspend fun getRecentAvoided(limit: Int): List<ScanResult> = scanDao.getRecentAvoided(limit).map(::mapScan)
+    suspend fun getRecentAvoided(limit: Int): List<ScanResult> = withContext(ioDispatcher) { scanDao.getRecentAvoided(limit).map(::mapScan) }
 
     /**
      * Barcode → Open Food Facts → Gemini (structured JSON). Nếu chưa cấu hình key / mất mạng
      * thì dùng [NutritionAnalyzer] offline để người dùng vẫn có kết quả ngay trong siêu thị.
      */
-    suspend fun analyzeProduct(product: Product): ProductAnalysis {
+    suspend fun analyzeProduct(product: Product): ProductAnalysis =
+        withContext(ioDispatcher) { analyzeProductOnIo(product) }
+
+    private suspend fun analyzeProductOnIo(product: Product): ProductAnalysis {
         val profile = profileRepository.getCurrentProfile()
         val aiResult = gemini.analyzeProduct(product, profile)
         val (analysis, aiError) = when (aiResult) {

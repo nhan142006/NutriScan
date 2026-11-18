@@ -24,3 +24,19 @@ Chi tiết kiến trúc, sơ đồ màn hình, ERD và bảng đối chiếu t�
 ```
 
 > Kết quả AI chỉ mang tính tham khảo, không thay thế tư vấn y tế.
+
+## Milestone 05 — Release 2.0.1
+
+Phần production/security được cập nhật từ `main` tại `c11cab7`, giữ nguyên các module mới của phiên bản 2.0.
+
+1. Sao chép `local.properties.example` thành `local.properties`, thêm Gemini key của nhóm nếu cần AI online.
+2. Tạo khóa ký một lần: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/New-ReleaseKeystore.ps1`.
+3. Sao lưu riêng thư mục `.signing/`; không gửi khóa hoặc mật khẩu vào Git/bài nộp.
+4. Build và đóng gói: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/Package-Milestone05.ps1`.
+
+Release bật R8 + resource shrinking, có signing riêng và được shell profiling mà không bật debuggable.
+Chỉ Debug có LeakCanary. Dữ liệu token do app quản lý được mã hóa, ràng buộc UID, hết hạn tối đa 5 phút và xóa khi đăng xuất.
+Firebase SDK vẫn quản lý phiên của SDK; app không lưu mật khẩu.
+
+Hướng dẫn đo/kiểm chứng và giới hạn: [`docs/MILESTONE_05_REPORT.md`](docs/MILESTONE_05_REPORT.md).
+Các file nộp sinh ra trong `submission/`; thư mục này và `.signing/` được loại khỏi Git.

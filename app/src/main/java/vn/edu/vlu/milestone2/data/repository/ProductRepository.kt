@@ -3,7 +3,9 @@ package vn.edu.vlu.milestone2.data.repository
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import vn.edu.vlu.milestone2.core.network.NetworkError
 import vn.edu.vlu.milestone2.core.network.NetworkResult
@@ -33,7 +35,10 @@ class ProductRepository(
 ) {
 
     /** Cache-first: cache còn mới (< 7 ngày) → trả ngay; nếu không thì gọi API, lỗi mạng → dùng cache cũ. */
-    suspend fun getProduct(barcode: String, forceRefresh: Boolean = false): NetworkResult<ProductLookup> {
+    suspend fun getProduct(barcode: String, forceRefresh: Boolean = false): NetworkResult<ProductLookup> =
+        withContext(ioDispatcher) { getProductOnIo(barcode, forceRefresh) }
+
+    private suspend fun getProductOnIo(barcode: String, forceRefresh: Boolean): NetworkResult<ProductLookup> {
         val code = barcode.trim()
         val cached = productDao.getProduct(code)
         val now = System.currentTimeMillis()
@@ -68,10 +73,11 @@ class ProductRepository(
 
     fun observeFavorites(): Flow<List<FavoriteItem>> =
         favoriteDao.observeFavorites().map { rows -> rows.map { FavoriteItem(it.product.toSummary(), it.addedAt) } }
+            .flowOn(ioDispatcher)
 
     fun observeIsFavorite(barcode: String): Flow<Boolean> = favoriteDao.observeIsFavorite(barcode)
 
-    suspend fun addFavorite(product: Product) {
+    suspend fun addFavorite(product: Product) = withContext(ioDispatcher) {
         if (productDao.getProduct(product.barcode) == null) {
             productDao.upsertProduct(product.toEntity(gson, System.currentTimeMillis()))
         }

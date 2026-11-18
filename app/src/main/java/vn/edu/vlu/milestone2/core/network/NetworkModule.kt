@@ -5,10 +5,10 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import vn.edu.vlu.milestone2.BuildConfig
+import vn.edu.vlu.milestone2.data.remote.firestore.ProfileApi
 import vn.edu.vlu.milestone2.data.remote.gemini.GeminiApi
 import vn.edu.vlu.milestone2.data.remote.mealdb.MealDbApi
 import vn.edu.vlu.milestone2.data.remote.openfoodfacts.OpenFoodFactsApi
@@ -25,11 +25,6 @@ class NetworkModule(context: Context) {
         .writeTimeout(READ_TIMEOUT_SECONDS, TimeUnit.SECONDS)
         .addInterceptor(ConnectivityInterceptor(context))
         .addInterceptor(userAgentInterceptor())
-        .addInterceptor(
-            HttpLoggingInterceptor().apply {
-                level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BASIC else HttpLoggingInterceptor.Level.NONE
-            }
-        )
         .build()
 
     /** Gemini xử lý ảnh lâu hơn → timeout đọc dài hơn. */
@@ -48,6 +43,10 @@ class NetworkModule(context: Context) {
 
     val geminiApi: GeminiApi by lazy {
         retrofit(BuildConfig.GEMINI_BASE_URL, geminiClient).create(GeminiApi::class.java)
+    }
+
+    val profileApi: ProfileApi by lazy {
+        retrofit("https://firestore.googleapis.com/", baseClient).create(ProfileApi::class.java)
     }
 
     private fun retrofit(baseUrl: String, client: OkHttpClient): Retrofit = Retrofit.Builder()

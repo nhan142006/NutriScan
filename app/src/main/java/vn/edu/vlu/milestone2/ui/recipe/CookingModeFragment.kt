@@ -63,6 +63,7 @@ class CookingModeFragment : Fragment() {
     }
 
     override fun onDestroyView() {
+        _binding?.recyclerChecklist?.adapter = null
         super.onDestroyView()
         _binding = null
     }

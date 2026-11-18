@@ -19,6 +19,7 @@ import vn.edu.vlu.milestone2.R
 import vn.edu.vlu.milestone2.core.ui.UiState
 import vn.edu.vlu.milestone2.core.ui.collectWithLifecycle
 import vn.edu.vlu.milestone2.core.ui.loadImage
+import vn.edu.vlu.milestone2.core.ui.clearImage
 import vn.edu.vlu.milestone2.core.ui.ratingStyle
 import vn.edu.vlu.milestone2.core.ui.showSnackbar
 import vn.edu.vlu.milestone2.core.ui.showState
@@ -142,6 +143,7 @@ class RecipeDetailFragment : Fragment() {
     }
 
     override fun onDestroyView() {
+        _binding?.imageRecipe?.clearImage()
         super.onDestroyView()
         _binding = null
     }

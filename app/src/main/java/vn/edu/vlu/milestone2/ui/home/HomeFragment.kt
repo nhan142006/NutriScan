@@ -66,6 +66,7 @@ class HomeFragment : Fragment() {
     }
 
     override fun onDestroyView() {
+        _binding?.recyclerRecent?.adapter = null
         super.onDestroyView()
         _binding = null
     }

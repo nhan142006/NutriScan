@@ -124,7 +124,9 @@ class ProfileViewModel(
         }
     }
 
-    fun signOut() = authRepository.signOut()
+    fun signOut() {
+        viewModelScope.launch { authRepository.signOut() }
+    }
 
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {

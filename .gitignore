@@ -16,3 +16,9 @@
 .externalNativeBuild
 .cxx
 local.properties
+/.signing/
+/submission/
+*.jks
+*.keystore
+*.hprof
+*.perfetto-trace

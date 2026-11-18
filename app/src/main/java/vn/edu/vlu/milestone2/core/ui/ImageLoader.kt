@@ -24,5 +24,8 @@ fun ImageView.loadImage(source: String?, centerCrop: Boolean = true) {
 
 /** Hủy request khi ViewHolder bị tái sử dụng để tránh hiển thị ảnh sai vị trí. */
 fun ImageView.clearImage() {
-    Glide.with(this).clear(this)
+    // RecyclerView may recycle children after Activity.isDestroyed becomes true.
+    // Only clearing uses the application manager; loads above remain View-scoped.
+    Glide.with(context.applicationContext).clear(this)
+    setImageDrawable(null)
 }

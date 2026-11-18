@@ -1,4 +1,28 @@
-# AI_USAGE.md — Milestone 04: Network Layer, RESTful API & Cloud Services Integration
+# AI_USAGE.md — NutriScan, Group 04
+
+## Milestone 05 — Production, Security and Release Packaging (18/11/2026)
+
+Tool: ChatGPT (Codex). User request: review the old Milestone 05 artifacts, then adapt
+Milestone 05 to the newly pulled main branch at c11cab7.
+
+Codex assisted with the implementation, test design/execution and evidence collection:
+
+- Updated the existing main architecture to version 2.0.1; enabled R8/resource shrinking and private Release signing.
+- Added an EncryptedSharedPreferences ID-token cache with UID/expiry isolation and an authenticated Firestore REST profile restore; retained SDK offline writes and never stored passwords.
+- Hardened backup and cleartext policies, private BuildConfig configuration and HTTP logging.
+- Reused ViewHolder listeners, released bound models/images/adapters and moved JSON mapping away from the main thread.
+- Added meaningful JVM/device tests, LeakCanary in Debug, repeatable emulator measurement and packaging/report scripts.
+- Created a local signing key and generated new artifacts; the private key and passwords are not included in Git or the submission.
+
+The release report distinguishes real emulator measurements, test-only performance fixtures,
+live Firebase checks, unavailable external credentials/services, and any remaining submission steps.
+Historical contributor claims are based on Git history, not invented Milestone 05 assignments.
+No numerical AI-usage percentage is claimed: the team must assess it against its course policy.
+GitHub publication requires a fresh account choice under the user's AGENTS.md instructions.
+
+---
+
+# Archived Milestone 04: Network Layer, RESTful API & Cloud Services Integration
 
 Khai báo theo **Quyết định 983/QĐ-ĐHVL-ĐT** (Pe.AI – Permitted AI).
 

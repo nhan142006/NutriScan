@@ -148,6 +148,7 @@ class AnalysisResultFragment : Fragment() {
     }
 
     override fun onDestroyView() {
+        _binding?.recyclerFlagged?.adapter = null
         super.onDestroyView()
         _binding = null
     }

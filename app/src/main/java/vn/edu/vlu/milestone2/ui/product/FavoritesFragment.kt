@@ -50,6 +50,7 @@ class FavoritesFragment : Fragment() {
     }
 
     override fun onDestroyView() {
+        _binding?.recyclerFavorites?.adapter = null
         super.onDestroyView()
         _binding = null
     }

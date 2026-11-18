@@ -24,12 +24,20 @@ class ProductAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) = holder.bind(getItem(position))
 
     override fun onViewRecycled(holder: ViewHolder) {
-        holder.binding.imageProduct.clearImage()
+        holder.recycle()
         super.onViewRecycled(holder)
     }
 
     inner class ViewHolder(val binding: ItemProductBinding) : RecyclerView.ViewHolder(binding.root) {
+        private var boundItem: ProductSummary? = null
+
+        init {
+            binding.root.setOnClickListener { boundItem?.let(onClick) }
+            binding.buttonAction.setOnClickListener { boundItem?.let { onRemove?.invoke(it) } }
+        }
+
         fun bind(item: ProductSummary) {
+            boundItem = item
             val context = binding.root.context
             binding.textName.text = item.name
             binding.textBrand.text = item.brand?.let { context.getString(R.string.product_brand_barcode, it, item.barcode) }
@@ -37,9 +45,12 @@ class ProductAdapter(
             binding.chipNutriscore.text = item.nutriScore?.let { context.getString(R.string.nutriscore_label, it) }
                 ?: context.getString(R.string.nutriscore_unknown)
             binding.imageProduct.loadImage(item.imageUrl)
-            binding.root.setOnClickListener { onClick(item) }
             binding.buttonAction.visibility = if (onRemove != null) View.VISIBLE else View.GONE
-            binding.buttonAction.setOnClickListener { onRemove?.invoke(item) }
+        }
+
+        fun recycle() {
+            boundItem = null
+            binding.imageProduct.clearImage()
         }
     }
 

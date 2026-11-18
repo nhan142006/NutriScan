@@ -1,158 +1,77 @@
 # AI_USAGE.md — NutriScan, Group 04
 
-## Milestone 05 — Production, Security and Release Packaging (18/11/2026)
+## Thông tin sử dụng AI
 
-Tool: ChatGPT (Codex). User request: review the old Milestone 05 artifacts, then adapt
-Milestone 05 to the newly pulled main branch at c11cab7.
+| Nội dung | Ghi nhận |
+| --- | --- |
+| Công cụ trong phiên Milestone 05 | ChatGPT (Codex) |
+| Ngày làm việc | 18/11/2026 |
+| Phạm vi | Rà soát và bổ sung hiệu năng, bảo mật, ký Release và tài liệu nộp bài |
+| Nền mã nguồn | Nhánh main tại commit `c11cab7`, đã có các module của ứng dụng |
 
-Codex assisted with the implementation, test design/execution and evidence collection:
+Nhóm sử dụng AI để giải thích vấn đề, đề xuất hướng xử lý và hỗ trợ thực hiện các thay đổi theo yêu cầu. Người dùng cung cấp đề bài, mã nguồn và các tệp cần đối chiếu, xác định phạm vi công việc và quyết định việc xuất bản. Trong phiên này, Codex cũng trực tiếp hỗ trợ chỉnh sửa code, chạy kiểm tra và chuẩn bị các tệp phát hành.
 
-- Updated the existing main architecture to version 2.0.1; enabled R8/resource shrinking and private Release signing.
-- Added an EncryptedSharedPreferences ID-token cache with UID/expiry isolation and an authenticated Firestore REST profile restore; retained SDK offline writes and never stored passwords.
-- Hardened backup and cleartext policies, private BuildConfig configuration and HTTP logging.
-- Reused ViewHolder listeners, released bound models/images/adapters and moved JSON mapping away from the main thread.
-- Added meaningful JVM/device tests, LeakCanary in Debug, repeatable emulator measurement and packaging/report scripts.
-- Created a local signing key and generated new artifacts; the private key and passwords are not included in Git or the submission.
+Các nội dung bên dưới tóm tắt câu hỏi và hướng xử lý từ trao đổi thực tế.
 
-The release report distinguishes real emulator measurements, test-only performance fixtures,
-live Firebase checks, unavailable external credentials/services, and any remaining submission steps.
-Historical contributor claims are based on Git history, not invented Milestone 05 assignments.
-No numerical AI-usage percentage is claimed: the team must assess it against its course policy.
-GitHub publication requires a fresh account choice under the user's AGENTS.md instructions.
+## 1. Trao đổi về Milestone 05
 
-For this Milestone 05 publication, the user explicitly selected GitHub account
-`Ngan3112` and requested that both author and committer of the unpublished M05
-commits use that identity. The verified GitHub noreply address is
-`189885155+Ngan3112@users.noreply.github.com`. Historical main commits retain
-their original authors. This Git identity choice does not claim that the account
-holder manually performed work generated or verified with Codex assistance.
+| Câu hỏi / yêu cầu của người dùng | Hướng xử lý AI đưa ra |
+| --- | --- |
+| Các tệp APK, PDF, video và AI_USAGE cũ có đúng với bản main mới pull không? | Đối chiếu lịch sử Git, phiên bản và metadata của APK với mã nguồn; xác định bộ cũ cần được cập nhật theo main mới. |
+| Làm Milestone 05 cho khớp với bản main hiện tại. | Kế thừa kiến trúc và chức năng đang có; chia công việc thành kiểm tra hiệu năng, bảo vệ dữ liệu và đóng gói Release. |
+| Khóa Release là khóa gì, nằm ở đâu? | Giải thích vai trò của file keystore khi ký APK/AAB, cách cấu hình ký và yêu cầu giữ lại khóa cho các bản cập nhật. |
+| Kiểm tra lại toàn bộ: có pull main rồi mới làm Milestone 05 không? | Kiểm tra reflog, quan hệ tổ tiên giữa main và nhánh M05, SHA trên GitHub, rồi đối chiếu APK/AAB, ZIP mã nguồn và báo cáo. |
+| Dùng tài khoản Ngan3112 và đổi danh tính commit tương ứng. | Giới hạn việc đổi author/committer ở các commit M05 chưa push; giữ lịch sử main, tạo lại metadata và bộ nộp theo commit mới. |
+| Viết lại AI_USAGE theo cách hỏi–đáp và làm rõ vai trò của người dùng. | Tóm tắt quá trình trao đổi, tách quyết định của người dùng khỏi phần AI hỗ trợ và ghi rõ phạm vi đã được kiểm chứng. |
 
----
+## 2. Vai trò của người dùng và nhóm
 
-# Archived Milestone 04: Network Layer, RESTful API & Cloud Services Integration
+Các nội dung người dùng đã thực hiện hoặc quyết định trong trao đổi:
 
-Khai báo theo **Quyết định 983/QĐ-ĐHVL-ĐT** (Pe.AI – Permitted AI).
+- Cung cấp repository, yêu cầu của từng milestone, ảnh đề bài và các tệp cần kiểm tra.
+- Cung cấp ảnh Firebase Console về cấu hình Authentication và tài khoản đã đăng ký.
+- Yêu cầu dùng main mới làm nền cho M05, kiểm tra lại kết quả và điều chỉnh cách trình bày tài liệu.
+- Chọn tài khoản GitHub Ngan3112, yêu cầu đổi danh tính commit và cho phép push nhánh M05.
 
-## 1. Công cụ AI đã dùng
+Nhóm cần tự rà soát mã nguồn, hiểu và giải thích được các thay đổi, xác nhận WBS và phần đóng góp thủ công của từng thành viên trước khi nộp. Những việc này chỉ được ghi là đã hoàn thành khi nhóm thực sự xác nhận.
 
-| Hạng mục | Thông tin |
-|---|---|
-| Công cụ | Claude (Anthropic), model Claude Opus 5.5, dùng qua ứng dụng claude.ai |
-| Ngày sử dụng | 09/11/2026 |
-| Người dùng | `[Họ tên – MSSV]` |
-| Hình thức | Tác tử AI đọc repo, tự viết code, tạo commit trên nhánh `feature/network-cloud-integration` và viết báo cáo |
+## 3. Phần AI hỗ trợ thực hiện trong M05
 
-## 2. Prompt đã dùng (nguyên văn)
+| Nhóm công việc | Phạm vi hỗ trợ |
+| --- | --- |
+| Rà soát mã nguồn | Đọc code và cấu hình hiện có, đối chiếu với yêu cầu M05, xác định các phần cần bổ sung trên main. |
+| Hiệu năng và vòng đời UI | Hỗ trợ sửa cách giữ/thả adapter, ảnh và model trong RecyclerView; chuyển một số xử lý JSON sang luồng I/O; tích hợp LeakCanary ở Debug. |
+| Bảo mật | Hỗ trợ cấu hình BuildConfig, chính sách backup/cleartext và cache phiên mã hóa bằng EncryptedSharedPreferences; xử lý UID, thời hạn cache và đăng xuất. |
+| Release | Hỗ trợ cấu hình R8/ProGuard, shrink resources, ký APK/AAB và script quản lý khóa riêng ngoài Git. |
+| Kiểm thử | Hỗ trợ tạo, chạy kiểm thử; thu số đo trên máy ảo; đối chiếu dữ liệu JSON sau R8, phiên đăng nhập và luồng sử dụng Release. |
+| Tài liệu và đóng gói | Hỗ trợ soạn báo cáo, quay demo trên máy ảo, tạo ZIP và checksum, rồi cập nhật theo kết quả kiểm tra. |
 
-1. *(Đính kèm file đề bài Milestone 04)* — "https://github.com/nhan142006/NutriScan.git, đây là github project nhóm tôi, đây là nhiệm vụ của tôi, hãy làm giúp tôi"
-2. "push lên git chưa"
-3. "để tôi tự push, cho tôi lệnh"
-4. *(Các lần dán kết quả Terminal để AI hướng dẫn tiếp lệnh git)*
-5. "tôi muốn xóa claude khỏi commit"
-6. *(Đính kèm đề bài bản cập nhật)* — "commit rồi bây giờ nộp gì"
+Các thay đổi này bổ sung vào ứng dụng đã có trên main. Phạm vi cụ thể có thể đối chiếu qua diff của nhánh `milestone05-production-security`, các file kiểm thử và bằng chứng đi kèm.
 
-## 3. Phạm vi AI đã thực hiện
+## 4. Kết quả và giới hạn kiểm chứng
 
-AI đã sinh **toàn bộ code và tài liệu** của 6 commit trong PR #3:
+Codex đã hỗ trợ chạy kiểm chứng trong workspace; bằng chứng được lưu cùng bộ nộp:
 
-- Cấu hình Gradle: Retrofit 3, OkHttp, Glide 5, Firebase BoM, google-services.
-- Lớp mạng: `NetworkModule`, `ConnectivityInterceptor`, `safeApiCall`, `NetworkError`, `UiState`.
-- Retrofit interface và data class cho Open Food Facts và TheMealDB.
-- Repository, ViewModel, Fragment, Adapter, layout của 4 phần: Auth, Tra cứu, Phân tích, Gợi ý món.
-- Unit test (MockWebServer, NutritionAnalyzer, AuthViewModel).
-- Báo cáo `docs/MILESTONE_04_REPORT.md`.
-- Hướng dẫn lệnh git: push, tạo PR, sửa commit message.
+- 25 unit tests và 6 device tests đạt, không có failure/error/skipped.
+- Lint không có lỗi; còn 31 cảnh báo Debug và 32 cảnh báo Release.
+- APK/AAB đã ký được kiểm tra chữ ký và đối chiếu metadata với mã nguồn.
+- Demo trên máy ảo dài khoảng 142 giây, sử dụng tài khoản test và dữ liệu thử có nhãn rõ.
+- Chưa xác nhận cuộn ổn định 60 fps; mẫu cuộn công thức có tỷ lệ jank cao hơn baseline.
+- Chưa cấu hình Gemini API key thật nên mới kiểm chứng fallback offline.
+- WBS của từng thành viên, GitHub Release/tag và link video công khai cần được nhóm hoàn tất.
 
-Ghi chú về lịch sử commit: các commit do AI tạo ban đầu có dòng `Co-Authored-By: Claude`. Nhóm đã xóa dòng này khỏi nhánh `main` bằng `git filter-branch`. Trang PR #3 trên GitHub vẫn lưu bản commit gốc có dòng này.
+Kết quả trên mô tả phạm vi đã đo và kiểm tra; nhóm cần tiếp tục đánh giá trên thiết bị và điều kiện sử dụng thực tế.
 
-## 4. Danh sách file do AI sinh / sửa
+## 5. Các trao đổi ở milestone trước
 
-| File | Loại | Mức độ AI |
-|---|---|---|
-| `app/build.gradle.kts` | Sửa | AI sinh toàn bộ phần thay đổi |
-| `app/src/main/AndroidManifest.xml` | Sửa | AI sinh toàn bộ phần thay đổi |
-| `app/src/main/java/vn/edu/vlu/milestone2/MainActivity.kt` | Sửa | AI sinh toàn bộ phần thay đổi |
-| `app/src/main/java/vn/edu/vlu/milestone2/NutriScanApp.kt` | Tạo mới | AI sinh toàn bộ phần thay đổi |
-| `app/src/main/java/vn/edu/vlu/milestone2/core/network/ConnectivityInterceptor.kt` | Tạo mới | AI sinh toàn bộ phần thay đổi |
-| `app/src/main/java/vn/edu/vlu/milestone2/core/network/NetworkError.kt` | Tạo mới | AI sinh toàn bộ phần thay đổi |
-| `app/src/main/java/vn/edu/vlu/milestone2/core/network/NetworkModule.kt` | Tạo mới | AI sinh toàn bộ phần thay đổi |
-| `app/src/main/java/vn/edu/vlu/milestone2/core/network/NetworkResult.kt` | Tạo mới | AI sinh toàn bộ phần thay đổi |
-| `app/src/main/java/vn/edu/vlu/milestone2/core/network/NoConnectivityException.kt` | Tạo mới | AI sinh toàn bộ phần thay đổi |
-| `app/src/main/java/vn/edu/vlu/milestone2/core/network/SafeApiCall.kt` | Tạo mới | AI sinh toàn bộ phần thay đổi |
-| `app/src/main/java/vn/edu/vlu/milestone2/core/ui/ImageLoader.kt` | Tạo mới | AI sinh toàn bộ phần thay đổi |
-| `app/src/main/java/vn/edu/vlu/milestone2/core/ui/NetworkErrorText.kt` | Tạo mới | AI sinh toàn bộ phần thay đổi |
-| `app/src/main/java/vn/edu/vlu/milestone2/core/ui/NetworkStateRenderer.kt` | Tạo mới | AI sinh toàn bộ phần thay đổi |
-| `app/src/main/java/vn/edu/vlu/milestone2/core/ui/UiState.kt` | Tạo mới | AI sinh toàn bộ phần thay đổi |
-| `app/src/main/java/vn/edu/vlu/milestone2/data/model/Product.kt` | Tạo mới | AI sinh toàn bộ phần thay đổi |
-| `app/src/main/java/vn/edu/vlu/milestone2/data/model/Recipe.kt` | Tạo mới | AI sinh toàn bộ phần thay đổi |
-| `app/src/main/java/vn/edu/vlu/milestone2/data/remote/mealdb/MealDbApi.kt` | Tạo mới | AI sinh toàn bộ phần thay đổi |
-| `app/src/main/java/vn/edu/vlu/milestone2/data/remote/mealdb/MealDbDtos.kt` | Tạo mới | AI sinh toàn bộ phần thay đổi |
-| `app/src/main/java/vn/edu/vlu/milestone2/data/remote/openfoodfacts/OpenFoodFactsApi.kt` | Tạo mới | AI sinh toàn bộ phần thay đổi |
-| `app/src/main/java/vn/edu/vlu/milestone2/data/remote/openfoodfacts/OpenFoodFactsDtos.kt` | Tạo mới | AI sinh toàn bộ phần thay đổi |
-| `app/src/main/java/vn/edu/vlu/milestone2/data/repository/AuthRepository.kt` | Tạo mới | AI sinh toàn bộ phần thay đổi |
-| `app/src/main/java/vn/edu/vlu/milestone2/data/repository/ProductRepository.kt` | Tạo mới | AI sinh toàn bộ phần thay đổi |
-| `app/src/main/java/vn/edu/vlu/milestone2/data/repository/RecipeRepository.kt` | Tạo mới | AI sinh toàn bộ phần thay đổi |
-| `app/src/main/java/vn/edu/vlu/milestone2/di/ServiceLocator.kt` | Tạo mới | AI sinh toàn bộ phần thay đổi |
-| `app/src/main/java/vn/edu/vlu/milestone2/domain/NutritionAnalyzer.kt` | Tạo mới | AI sinh toàn bộ phần thay đổi |
-| `app/src/main/java/vn/edu/vlu/milestone2/ui/analysis/AnalysisFragment.kt` | Sửa | AI sinh toàn bộ phần thay đổi |
-| `app/src/main/java/vn/edu/vlu/milestone2/ui/analysis/AnalysisViewModel.kt` | Sửa | AI sinh toàn bộ phần thay đổi |
-| `app/src/main/java/vn/edu/vlu/milestone2/ui/auth/AuthViewModel.kt` | Tạo mới | AI sinh toàn bộ phần thay đổi |
-| `app/src/main/java/vn/edu/vlu/milestone2/ui/auth/LoginFragment.kt` | Tạo mới | AI sinh toàn bộ phần thay đổi |
-| `app/src/main/java/vn/edu/vlu/milestone2/ui/auth/RegisterFragment.kt` | Tạo mới | AI sinh toàn bộ phần thay đổi |
-| `app/src/main/java/vn/edu/vlu/milestone2/ui/auth/SessionViewModel.kt` | Tạo mới | AI sinh toàn bộ phần thay đổi |
-| `app/src/main/java/vn/edu/vlu/milestone2/ui/recipe/RecipeAdapter.kt` | Tạo mới | AI sinh toàn bộ phần thay đổi |
-| `app/src/main/java/vn/edu/vlu/milestone2/ui/recipe/RecipeFragment.kt` | Sửa | AI sinh toàn bộ phần thay đổi |
-| `app/src/main/java/vn/edu/vlu/milestone2/ui/recipe/RecipeViewModel.kt` | Sửa | AI sinh toàn bộ phần thay đổi |
-| `app/src/main/java/vn/edu/vlu/milestone2/ui/scanner/ProductAdapter.kt` | Tạo mới | AI sinh toàn bộ phần thay đổi |
-| `app/src/main/java/vn/edu/vlu/milestone2/ui/scanner/ScannerFragment.kt` | Sửa | AI sinh toàn bộ phần thay đổi |
-| `app/src/main/java/vn/edu/vlu/milestone2/ui/scanner/ScannerViewModel.kt` | Sửa | AI sinh toàn bộ phần thay đổi |
-| `app/src/main/res/drawable/ic_cloud_off.xml` | Tạo mới | AI sinh toàn bộ phần thay đổi |
-| `app/src/main/res/drawable/ic_image_error.xml` | Tạo mới | AI sinh toàn bộ phần thay đổi |
-| `app/src/main/res/drawable/ic_image_placeholder.xml` | Tạo mới | AI sinh toàn bộ phần thay đổi |
-| `app/src/main/res/drawable/ic_logout.xml` | Tạo mới | AI sinh toàn bộ phần thay đổi |
-| `app/src/main/res/layout/activity_main.xml` | Sửa | AI sinh toàn bộ phần thay đổi |
-| `app/src/main/res/layout/fragment_analysis_result.xml` | Sửa | AI sinh toàn bộ phần thay đổi |
-| `app/src/main/res/layout/fragment_barcode_scanner.xml` | Sửa | AI sinh toàn bộ phần thay đổi |
-| `app/src/main/res/layout/fragment_login.xml` | Tạo mới | AI sinh toàn bộ phần thay đổi |
-| `app/src/main/res/layout/fragment_recipe_recommendation.xml` | Sửa | AI sinh toàn bộ phần thay đổi |
-| `app/src/main/res/layout/fragment_register.xml` | Tạo mới | AI sinh toàn bộ phần thay đổi |
-| `app/src/main/res/layout/item_product.xml` | Tạo mới | AI sinh toàn bộ phần thay đổi |
-| `app/src/main/res/layout/item_recipe.xml` | Tạo mới | AI sinh toàn bộ phần thay đổi |
-| `app/src/main/res/layout/view_network_state.xml` | Tạo mới | AI sinh toàn bộ phần thay đổi |
-| `app/src/main/res/menu/bottom_nav_menu.xml` | Sửa | AI sinh toàn bộ phần thay đổi |
-| `app/src/main/res/menu/menu_main.xml` | Tạo mới | AI sinh toàn bộ phần thay đổi |
-| `app/src/main/res/navigation/nav_graph.xml` | Sửa | AI sinh toàn bộ phần thay đổi |
-| `app/src/main/res/values/colors.xml` | Sửa | AI sinh toàn bộ phần thay đổi |
-| `app/src/main/res/values/strings.xml` | Sửa | AI sinh toàn bộ phần thay đổi |
-| `app/src/test/java/vn/edu/vlu/milestone2/data/repository/ProductRepositoryTest.kt` | Tạo mới | AI sinh toàn bộ phần thay đổi |
-| `app/src/test/java/vn/edu/vlu/milestone2/data/repository/RecipeRepositoryTest.kt` | Tạo mới | AI sinh toàn bộ phần thay đổi |
-| `app/src/test/java/vn/edu/vlu/milestone2/domain/NutritionAnalyzerTest.kt` | Tạo mới | AI sinh toàn bộ phần thay đổi |
-| `app/src/test/java/vn/edu/vlu/milestone2/ui/auth/AuthViewModelTest.kt` | Tạo mới | AI sinh toàn bộ phần thay đổi |
-| `build.gradle.kts` | Sửa | AI sinh toàn bộ phần thay đổi |
-| `docs/MILESTONE_04_REPORT.md` | Tạo mới | AI sinh toàn bộ phần thay đổi |
-| `gradle/libs.versions.toml` | Sửa | AI sinh toàn bộ phần thay đổi |
+Theo bản khai báo đã có trong repository, Milestone 04 sử dụng Claude để hỗ trợ phần code và tài liệu của sáu commit trong PR #3. Các trao đổi gồm cung cấp đề bài và repository, yêu cầu hỗ trợ phần mạng/cloud, hỏi về lệnh Git và chuẩn bị hồ sơ nộp.
 
-## 5. Phần do thành viên nhóm thực hiện
+Ở phần Firebase Authentication, người dùng cung cấp yêu cầu Login/Register, duy trì phiên và xử lý lỗi; AI hỗ trợ hướng triển khai Repository–ViewModel–ViewBinding và các thay đổi liên quan. Người dùng cung cấp ảnh Firebase Console để đối chiếu cấu hình.
 
-| Công việc | Người thực hiện |
-|---|---|
-| Push nhánh, tạo và merge Pull Request #3 | `[Tên]` |
-| Tạo project Firebase, bật Email/Password, thêm `google-services.json` | `[Tên]` |
-| Build, chạy thử trên thiết bị/emulator, sửa lỗi (nếu có) | `[Tên]` |
-| Kiểm tra lại code, chỉnh sửa thêm (ghi rõ file nếu có) | `[Tên]` |
-| Chụp màn hình Firebase Console, quay video demo | `[Tên]` |
-| Điền WBS, hoàn thiện báo cáo | `[Tên]` |
+Chi tiết khai báo trước lần biên tập này, gồm prompt và danh sách file, được giữ trong [AI_USAGE_HISTORY.md](docs/AI_USAGE_HISTORY.md). Các kết quả cũ về việc chưa build được thuộc phiên làm việc trước; kết quả M05 được ghi riêng ở mục 4.
 
-## 6. Kiểm chứng
+## 6. Rà soát trước khi nộp
 
-- Code do AI sinh **chưa được build trong môi trường của AI**, vì không truy cập được Android SDK. Nhóm đã build và chạy kiểm tra lại: `[Có / Chưa — ghi kết quả]`.
-- Unit test: `./gradlew :app:testDebugUnitTest` → `[kết quả]`.
+Nhóm cần kiểm tra lại phạm vi hỗ trợ AI, bổ sung thông tin thành viên và công việc thủ công có bằng chứng, đồng thời tự đánh giá mức sử dụng AI theo quy định môn học. Tài liệu này chưa đưa ra tỷ lệ phần trăm AI khi nhóm chưa có đánh giá xác nhận.
 
-## 7. Tỷ lệ sử dụng AI (tự đánh giá)
-
-`[Nhóm tự điền — ước tính % trên tổng khối lượng milestone, có so sánh với giới hạn 30–50% của đề]`
-
-
-## 8. Bổ sung — Thành viên 4, Detail / Delete / Network Errors
-
-ChatGPT (Codex) được dùng để đọc repo, viết phần Chi tiết, thao tác lưu/xóa qua Firestore REST, xử lý lỗi và Retry, bổ sung ca kiểm thử Repository và mục 9 của worksheet. Phạm vi thay đổi được ghi trong diff của PR bổ sung. Việc cấu hình Firestore, chạy thử trên thiết bị, kiểm tra code và quay video thuộc phần xác nhận của nhóm. Phiên làm việc này chưa chạy được unit test vì Gradle Wrapper không tải được bản phân phối Gradle.
+Khóa ký, mật khẩu và API key thật được giữ riêng ngoài Git và bộ nộp.

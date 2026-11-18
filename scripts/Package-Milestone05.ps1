@@ -30,6 +30,12 @@ try {
     Copy-Item -LiteralPath $apk -Destination (Join-Path $outputDirectory 'Group04_NutriScan_Milestone05_Release.apk')
     Copy-Item -LiteralPath $bundle -Destination (Join-Path $outputDirectory 'Group04_NutriScan_Milestone05_Release.aab')
     Copy-Item -LiteralPath 'AI_USAGE.md' -Destination (Join-Path $outputDirectory 'AI_USAGE.md')
+    $aiHistory = Join-Path $projectRoot 'docs/AI_USAGE_HISTORY.md'
+    if (Test-Path -LiteralPath $aiHistory) {
+        $submissionDocs = Join-Path $outputDirectory 'docs'
+        New-Item -ItemType Directory -Force $submissionDocs | Out-Null
+        Copy-Item -LiteralPath $aiHistory -Destination (Join-Path $submissionDocs 'AI_USAGE_HISTORY.md')
+    }
     $publicCertificate = Join-Path $projectRoot '.signing/release-certificate.pem'
     if (Test-Path $publicCertificate) { Copy-Item -LiteralPath $publicCertificate -Destination $outputDirectory }
     [IO.File]::WriteAllLines((Join-Path $outputDirectory 'APK_SIGNATURE.txt'), $signature, [Text.UTF8Encoding]::new($false))

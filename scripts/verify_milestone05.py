@@ -29,11 +29,15 @@ def adb(*args: str, binary: bool = False, timeout: int = 40):
 
 
 def ui():
-    text = adb("exec-out", "uiautomator", "dump", "/dev/tty")
-    match = re.search(r"<\?xml.*?</hierarchy>", text, re.S)
-    if not match:
-        raise RuntimeError("No UI hierarchy returned")
-    return ET.fromstring(match.group())
+    # Network-driven layout/animations can briefly prevent accessibility from
+    # reaching idle. Retry the read without changing app state or hiding errors.
+    for _ in range(4):
+        text = adb("exec-out", "uiautomator", "dump", "/dev/tty")
+        match = re.search(r"<\?xml.*?</hierarchy>", text, re.S)
+        if match:
+            return ET.fromstring(match.group())
+        time.sleep(0.5)
+    raise RuntimeError("No UI hierarchy returned after four reads")
 
 
 def find(resource_id: str, tree=None):

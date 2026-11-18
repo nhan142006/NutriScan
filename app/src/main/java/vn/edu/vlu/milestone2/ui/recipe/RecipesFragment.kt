@@ -129,6 +129,14 @@ class RecipesFragment : Fragment() {
     }
 
     override fun onDestroyView() {
+        _binding?.let {
+            it.recyclerAi.adapter = null
+            it.recyclerMatches.adapter = null
+            it.recyclerMy.adapter = null
+            it.recyclerBrowse.adapter = null
+            it.scrollRecipes.setOnScrollChangeListener(null as NestedScrollView.OnScrollChangeListener?)
+        }
+        renderedCategories = emptyList()
         super.onDestroyView()
         _binding = null
     }

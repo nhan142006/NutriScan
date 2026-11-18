@@ -28,12 +28,26 @@ class ScanHistoryAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) = holder.bind(getItem(position))
 
     override fun onViewRecycled(holder: ViewHolder) {
-        holder.binding.imageThumb.clearImage()
+        holder.recycle()
         super.onViewRecycled(holder)
     }
 
     inner class ViewHolder(val binding: ItemScanHistoryBinding) : RecyclerView.ViewHolder(binding.root) {
+        private var boundItem: ScanResult? = null
+
+        init {
+            binding.root.setOnClickListener { boundItem?.let(onClick) }
+            binding.root.setOnLongClickListener {
+                val item = boundItem
+                if (item != null && onLongClick != null) {
+                    onLongClick.invoke(item)
+                    true
+                } else false
+            }
+        }
+
         fun bind(item: ScanResult) {
+            boundItem = item
             val context = binding.root.context
             binding.textName.text = item.productName
             val source = context.getString(
@@ -55,11 +69,11 @@ class ScanHistoryAdapter(
                     if (item.source == ScanSource.BARCODE) R.drawable.ic_barcode else R.drawable.ic_camera
                 )
             }
-            binding.root.setOnClickListener { onClick(item) }
-            binding.root.setOnLongClickListener {
-                onLongClick?.invoke(item)
-                onLongClick != null
-            }
+        }
+
+        fun recycle() {
+            boundItem = null
+            binding.imageThumb.clearImage()
         }
     }
 

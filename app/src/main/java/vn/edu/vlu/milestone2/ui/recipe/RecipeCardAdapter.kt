@@ -42,12 +42,17 @@ class RecipeCardAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) = holder.bind(getItem(position))
 
     override fun onViewRecycled(holder: ViewHolder) {
-        holder.binding.imageRecipe.clearImage()
+        holder.recycle()
         super.onViewRecycled(holder)
     }
 
     inner class ViewHolder(val binding: ItemRecipeBinding) : RecyclerView.ViewHolder(binding.root) {
+        private var boundItem: RecipeCardItem? = null
+
+        init { binding.root.setOnClickListener { boundItem?.let(onClick) } }
+
         fun bind(item: RecipeCardItem) {
+            boundItem = item
             binding.textTitle.text = item.title
             binding.textSubtitle.text = item.subtitle
             binding.textSubtitle.visibility = if (item.subtitle.isNullOrBlank()) View.GONE else View.VISIBLE
@@ -61,7 +66,11 @@ class RecipeCardAdapter(
             }
             binding.textBadge.visibility = if (item.badge != null) View.VISIBLE else View.GONE
             item.badge?.let { binding.textBadge.applyRatingPill(ratingStyle(it)) }
-            binding.root.setOnClickListener { onClick(item) }
+        }
+
+        fun recycle() {
+            boundItem = null
+            binding.imageRecipe.clearImage()
         }
     }
 

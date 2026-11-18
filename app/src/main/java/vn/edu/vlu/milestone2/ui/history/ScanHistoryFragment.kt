@@ -83,6 +83,7 @@ class ScanHistoryFragment : Fragment() {
     }
 
     override fun onDestroyView() {
+        _binding?.recyclerHistory?.adapter = null
         super.onDestroyView()
         _binding = null
     }

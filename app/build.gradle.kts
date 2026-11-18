@@ -14,6 +14,23 @@ val localProperties = Properties().apply {
 }
 val geminiApiKey: String = localProperties.getProperty("GEMINI_API_KEY", "")
 val geminiModel: String = localProperties.getProperty("GEMINI_MODEL", "gemini-2.5-flash")
+val mealDbApiKey = localProperties.getProperty("MEAL_DB_API_KEY", "1").trim()
+fun String.asBuildConfigString(): String = "\"" + replace("\\", "\\\\")
+    .replace("\"", "\\\"").replace("\n", "\\n").replace("\r", "\\r") + "\""
+
+// Private configuration: generated once by scripts/New-ReleaseKeystore.ps1.
+val signingProperties = Properties().apply {
+    val file = rootProject.file(".signing/release.properties")
+    if (file.exists()) file.inputStream().use { load(it) }
+}
+fun releaseProperty(name: String): String = providers.environmentVariable(name).orNull
+    ?: signingProperties.getProperty(name, localProperties.getProperty(name, ""))
+val releaseStoreFile = releaseProperty("NUTRISCAN_RELEASE_STORE_FILE")
+val releaseStorePassword = releaseProperty("NUTRISCAN_RELEASE_STORE_PASSWORD")
+val releaseKeyAlias = releaseProperty("NUTRISCAN_RELEASE_KEY_ALIAS")
+val releaseKeyPassword = releaseProperty("NUTRISCAN_RELEASE_KEY_PASSWORD")
+val releaseSigningReady = listOf(releaseStoreFile, releaseStorePassword, releaseKeyAlias, releaseKeyPassword)
+    .all { it.isNotBlank() }
 
 android {
     namespace = "vn.edu.vlu.milestone2"
@@ -23,21 +40,35 @@ android {
         applicationId = "vn.edu.vlu.milestone2"
         minSdk = 24
         targetSdk = 37
-        versionCode = 2
-        versionName = "2.0"
+        versionCode = 3
+        versionName = "2.0.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         buildConfigField("String", "OPEN_FOOD_FACTS_BASE_URL", "\"https://world.openfoodfacts.org/\"")
-        buildConfigField("String", "MEAL_DB_BASE_URL", "\"https://www.themealdb.com/api/json/v1/1/\"")
+        buildConfigField("String", "MEAL_DB_BASE_URL", "https://www.themealdb.com/api/json/v1/$mealDbApiKey/".asBuildConfigString())
         buildConfigField("String", "GEMINI_BASE_URL", "\"https://generativelanguage.googleapis.com/\"")
-        buildConfigField("String", "GEMINI_API_KEY", "\"$geminiApiKey\"")
-        buildConfigField("String", "GEMINI_MODEL", "\"$geminiModel\"")
+        buildConfigField("String", "GEMINI_API_KEY", geminiApiKey.asBuildConfigString())
+        buildConfigField("String", "GEMINI_MODEL", geminiModel.asBuildConfigString())
+    }
+
+    signingConfigs {
+        if (releaseSigningReady) {
+            create("release") {
+                storeFile = rootProject.file(releaseStoreFile)
+                storePassword = releaseStorePassword
+                keyAlias = releaseKeyAlias
+                keyPassword = releaseKeyPassword
+            }
+        }
     }
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            if (releaseSigningReady) signingConfig = signingConfigs.getByName("release")
         }
     }
 
@@ -49,6 +80,16 @@ android {
     buildFeatures {
         viewBinding = true
         buildConfig = true
+    }
+}
+
+// Fail rather than accidentally hand in an unsigned or debug-signed Release APK.
+tasks.matching { it.name == "preReleaseBuild" }.configureEach {
+    val signingConfigured = releaseSigningReady
+    doFirst {
+        check(signingConfigured) {
+            "Release signing is missing. Run scripts/New-ReleaseKeystore.ps1 or configure NUTRISCAN_RELEASE_* privately."
+        }
     }
 }
 
@@ -91,6 +132,8 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
     implementation(libs.kotlinx.coroutines.play.services)
+    implementation(libs.androidx.security.crypto)
+    debugImplementation(libs.leakcanary.android)
 
     // CameraX + ML Kit + WorkManager (proposal 3.2 / 3.3 / 4.4)
     implementation(libs.androidx.camera.core)

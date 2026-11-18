@@ -17,6 +17,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import vn.edu.vlu.milestone2.data.security.CachedSessionToken
+import vn.edu.vlu.milestone2.data.security.SessionTokenStore
 
 data class AuthUser(val uid: String, val email: String?, val displayName: String?)
 
@@ -41,13 +45,18 @@ interface AuthRepository {
 
     suspend fun register(displayName: String, email: String, password: String): AuthResult
 
-    fun signOut()
+    suspend fun signOut()
+
+    /** Bearer token for the authenticated Firestore REST restore path. Never a password. */
+    suspend fun getIdToken(): String?
 }
 
 class FirebaseAuthRepository(
     private val firebaseAuth: FirebaseAuth,
+    private val sessionStore: SessionTokenStore,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : AuthRepository {
+    private val sessionMutex = Mutex()
 
     override val currentUser: AuthUser?
         get() = firebaseAuth.currentUser?.toAuthUser()
@@ -71,7 +80,36 @@ class FirebaseAuthRepository(
         AuthUser(uid = user.uid, email = user.email, displayName = displayName.trim())
     }
 
-    override fun signOut() = firebaseAuth.signOut()
+    override suspend fun signOut() = withContext(ioDispatcher) {
+        sessionMutex.withLock {
+            // Storage failure must not leave Firebase authenticated.
+            runCatching { sessionStore.clear() }
+            firebaseAuth.signOut()
+        }
+    }
+
+    override suspend fun getIdToken(): String? = withContext(ioDispatcher) {
+        sessionMutex.withLock {
+            val user = firebaseAuth.currentUser ?: return@withLock null
+            val now = System.currentTimeMillis()
+            val cached = runCatching { sessionStore.read() }.getOrNull()
+            if (cached != null && cached.isUsableFor(user.uid, now)) return@withLock cached.token
+            val result = user.getIdToken(false).await()
+            val token = result.token ?: return@withLock null
+            val session = CachedSessionToken(
+                userId = user.uid,
+                token = token,
+                cachedAtMillis = now,
+                expiresAtMillis = minOf(
+                    result.expirationTimestamp * 1_000 - 60_000,
+                    now + CachedSessionToken.MAX_CACHE_AGE_MILLIS
+                )
+            )
+            // Keystore unavailable? Use the in-memory SDK result, never plaintext storage.
+            runCatching { sessionStore.save(session) }
+            token
+        }
+    }
 
     private suspend fun runAuth(block: suspend () -> AuthUser): AuthResult = withContext(ioDispatcher) {
         try {

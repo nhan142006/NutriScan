@@ -8,6 +8,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import vn.edu.vlu.milestone2.core.network.NetworkMonitor
 import vn.edu.vlu.milestone2.data.repository.AuthRepository
 import vn.edu.vlu.milestone2.data.repository.AuthUser
@@ -27,7 +28,9 @@ class SessionViewModel(
     val isOnline: StateFlow<Boolean> = networkMonitor.isOnlineFlow
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), true)
 
-    fun signOut() = authRepository.signOut()
+    fun signOut() {
+        viewModelScope.launch { authRepository.signOut() }
+    }
 
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {

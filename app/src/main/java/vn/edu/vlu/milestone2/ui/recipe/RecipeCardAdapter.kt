@@ -3,6 +3,8 @@ package vn.edu.vlu.milestone2.ui.recipe
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import androidx.annotation.DrawableRes
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -48,6 +50,8 @@ class RecipeCardAdapter(
 
     inner class ViewHolder(val binding: ItemRecipeBinding) : RecyclerView.ViewHolder(binding.root) {
         private var boundItem: RecipeCardItem? = null
+        private var remoteImageBound = false
+        @DrawableRes private var iconRes = 0
 
         init { binding.root.setOnClickListener { boundItem?.let(onClick) } }
 
@@ -57,12 +61,23 @@ class RecipeCardAdapter(
             binding.textSubtitle.text = item.subtitle
             binding.textSubtitle.visibility = if (item.subtitle.isNullOrBlank()) View.GONE else View.VISIBLE
             if (item.imageUrl != null) {
-                binding.imageRecipe.scaleType = android.widget.ImageView.ScaleType.CENTER_CROP
+                binding.imageRecipe.scaleType = ImageView.ScaleType.CENTER_CROP
                 binding.imageRecipe.loadImage(item.imageUrl)
+                remoteImageBound = true
+                iconRes = 0
             } else {
-                binding.imageRecipe.clearImage()
-                binding.imageRecipe.scaleType = android.widget.ImageView.ScaleType.CENTER
-                binding.imageRecipe.setImageResource(if (item.isAi) R.drawable.ic_auto_awesome else R.drawable.ic_restaurant)
+                // Món không có ảnh (món tự tạo / AI): chỉ hủy Glide khi holder từng tải ảnh mạng,
+                // và chỉ đặt lại icon khi đổi loại icon, để giảm việc trên main thread khi cuộn.
+                val icon = if (item.isAi) R.drawable.ic_auto_awesome else R.drawable.ic_restaurant
+                if (remoteImageBound) {
+                    binding.imageRecipe.clearImage()
+                    remoteImageBound = false
+                }
+                if (iconRes != icon) {
+                    binding.imageRecipe.scaleType = ImageView.ScaleType.CENTER
+                    binding.imageRecipe.setImageResource(icon)
+                    iconRes = icon
+                }
             }
             binding.textBadge.visibility = if (item.badge != null) View.VISIBLE else View.GONE
             item.badge?.let { binding.textBadge.applyRatingPill(ratingStyle(it)) }
@@ -70,7 +85,11 @@ class RecipeCardAdapter(
 
         fun recycle() {
             boundItem = null
-            binding.imageRecipe.clearImage()
+            if (remoteImageBound) {
+                binding.imageRecipe.clearImage()
+                remoteImageBound = false
+                iconRes = 0
+            }
         }
     }
 

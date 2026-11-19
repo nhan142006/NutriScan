@@ -13,7 +13,7 @@
     <string name="recipes_my_title">Món của tôi (đã lưu &amp; tự tạo)</string>
     <string name="recipes_my_empty">Lưu món yêu thích hoặc tự tạo món – xem được cả khi offline.</string>
     <string name="recipes_explore_title">Khám phá TheMealDB</string>
-    <string name="recipes_search_hint">Tìm món (ví dụ: chicken, salmon)</string>
+    <string name="recipes_search_hint">Tìm món (ví dụ: gà rán, cá hồi nướng)</string>
     <string name="recipes_add">Thêm món</string>
     <string name="recipes_source_ai">Gợi ý AI</string>
     <string name="recipes_source_user">Món tự tạo</string>

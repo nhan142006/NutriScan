@@ -33,11 +33,7 @@ class HealthProfileFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        fieldsFilled = savedInstanceState != null
-        binding.textAccount.text = viewModel.accountEmail
-        binding.autoDietGoal.setAdapter(
-            ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, ProfileFormState.DIET_GOALS)
-        )
+        fieldsFilled = savedInstanceState?.getBoolean(KEY_FIELDS_FILLED) ?: false
         binding.layoutCustomCondition.setEndIconOnClickListener {
             viewModel.addCustomCondition(binding.editCustomCondition.text.toString())
             binding.editCustomCondition.text?.clear()
@@ -64,15 +60,27 @@ class HealthProfileFragment : Fragment() {
         }
         binding.buttonLogout.setOnClickListener { viewModel.signOut() }
 
-        collectWithLifecycle(viewModel.profile) { profile ->
-            viewModel.onProfileLoaded(profile)
-            renderProfile(profile)
+        collectWithLifecycle(viewModel.accountEmail) { email ->
+            binding.textAccount.text = email
+        }
+        collectWithLifecycle(viewModel.profile) { state ->
+            binding.buttonSave.isEnabled = !state.isLoading && !viewModel.form.value.isSaving
+            binding.editName.isEnabled = !state.isLoading
+            binding.editAge.isEnabled = !state.isLoading
+            binding.editCalories.isEnabled = !state.isLoading
+            binding.autoDietGoal.isEnabled = !state.isLoading
+            if (!state.isLoading) renderProfile(state.profile)
         }
         collectWithLifecycle(viewModel.form) { form ->
+            if (binding.autoDietGoal.adapter == null) {
+                binding.autoDietGoal.setAdapter(
+                    ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, form.dietGoalOptions)
+                )
+            }
             binding.layoutName.error = form.nameError?.let { getString(it) }
             binding.layoutAge.error = form.ageError?.let { getString(it) }
             binding.layoutCalories.error = form.calorieError?.let { getString(it) }
-            binding.buttonSave.isEnabled = !form.isSaving
+            binding.buttonSave.isEnabled = !form.isSaving && !viewModel.profile.value.isLoading
             renderChips(binding.chipGroupConditions, form.conditionOptions, form.conditions, viewModel::toggleCondition)
             renderChips(binding.chipGroupAllergies, form.allergyOptions, form.allergies, viewModel::toggleAllergy)
         }
@@ -83,8 +91,8 @@ class HealthProfileFragment : Fragment() {
                     fieldsFilled = false
                     binding.editName.text?.clear()
                     binding.editAge.text?.clear()
-                    binding.editCalories.setText(DEFAULT_CALORIES)
-                    binding.autoDietGoal.setText(ProfileFormState.DIET_GOALS.first(), false)
+                    binding.editCalories.setText(viewModel.form.value.defaultCalorieTarget.toString())
+                    binding.autoDietGoal.setText(viewModel.form.value.defaultDietGoal, false)
                     binding.root.showSnackbar(getString(R.string.profile_deleted))
                 }
             }
@@ -101,8 +109,8 @@ class HealthProfileFragment : Fragment() {
         fieldsFilled = true
         binding.editName.setText(profile?.fullName.orEmpty())
         binding.editAge.setText(profile?.age?.toString().orEmpty())
-        binding.editCalories.setText(profile?.dailyCalorieTarget?.toString() ?: DEFAULT_CALORIES)
-        binding.autoDietGoal.setText(profile?.dietGoal?.ifBlank { null } ?: ProfileFormState.DIET_GOALS.first(), false)
+        binding.editCalories.setText((profile?.dailyCalorieTarget ?: viewModel.form.value.defaultCalorieTarget).toString())
+        binding.autoDietGoal.setText(profile?.dietGoal?.ifBlank { null } ?: viewModel.form.value.defaultDietGoal, false)
     }
 
     /** Dựng lại chip chỉ khi danh sách thay đổi; trạng thái chọn lấy từ ViewModel (nguồn sự thật). */
@@ -133,12 +141,17 @@ class HealthProfileFragment : Fragment() {
         }
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean(KEY_FIELDS_FILLED, fieldsFilled)
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
 
     private companion object {
-        const val DEFAULT_CALORIES = "2000"
+        const val KEY_FIELDS_FILLED = "profile_fields_filled"
     }
 }

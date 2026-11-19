@@ -23,6 +23,13 @@ Chi tiết kiến trúc, sơ đồ màn hình, ERD và bảng đối chiếu t�
 ./gradlew connectedDebugAndroidTest  # Room DAO (cần máy ảo/thiết bị)
 ```
 
+## Milestone 02 — MVVM & ViewBinding
+
+Đối chiếu yêu cầu, các màn hình và kết quả kiểm tra: [docs/MILESTONE_02_REPORT.md](docs/MILESTONE_02_REPORT.md).
+File URL repository để nộp: [Repository_Link.txt](Repository_Link.txt).
+Mã nguồn dùng ViewBinding cho Activity/Fragment/Adapter; dữ liệu đi qua Repository và ViewModel,
+được quan sát theo vòng đời view. Cấu hình IDE, cache và thư mục build được loại khỏi Git.
+
 > Kết quả AI chỉ mang tính tham khảo, không thay thế tư vấn y tế.
 
 ## Milestone 05 — Release 2.0.1

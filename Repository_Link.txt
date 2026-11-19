@@ -1,0 +1,5 @@
+NutriScan - Group 04
+Public source repository: https://github.com/nhan142006/NutriScan
+Milestone 02 baseline: main @ e541ded6dc810d93c63b2101cefab72fcf5908d4
+Local working branch: feature/milestone02-mvvm
+The accompanying source ZIP includes the local M02 changes. This file does not assert that the local branch has been published.

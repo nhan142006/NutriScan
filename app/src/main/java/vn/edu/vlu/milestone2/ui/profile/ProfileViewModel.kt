@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -33,13 +34,23 @@ data class ProfileFormState(
     /** Chip hiển thị = danh sách gợi ý sẵn + mục người dùng tự thêm. */
     val conditionOptions: List<String> get() = (PRESET_CONDITIONS + conditions).distinct()
     val allergyOptions: List<String> get() = (PRESET_ALLERGIES + allergies).distinct()
+    val dietGoalOptions: List<String> get() = DIET_GOALS
+    val defaultDietGoal: String get() = dietGoalOptions.first()
+    val defaultCalorieTarget: Int get() = DEFAULT_CALORIE_TARGET
 
     companion object {
+        private const val DEFAULT_CALORIE_TARGET = 2000
         val PRESET_CONDITIONS = listOf("Tiểu đường", "Cao huyết áp", "Mỡ máu cao", "Bệnh thận", "Gout")
         val PRESET_ALLERGIES = listOf("Đậu phộng", "Sữa / Lactose", "Gluten", "Hải sản", "Trứng", "Đậu nành", "Hạt", "Mè")
         val DIET_GOALS = listOf("Giữ cân", "Giảm cân", "Tăng cơ", "Ăn chay", "Ít đường", "Ít muối")
     }
 }
+
+/** Không dùng null để đại diện đồng thời cho đang tải và chưa có hồ sơ. */
+data class ProfileUiState(
+    val profile: HealthProfile? = null,
+    val isLoading: Boolean = true
+)
 
 sealed interface ProfileEvent {
     data object Saved : ProfileEvent
@@ -52,13 +63,19 @@ class ProfileViewModel(
     private val authRepository: AuthRepository
 ) : ViewModel() {
 
-    val profile: StateFlow<HealthProfile?> = profileRepository.observeCurrentProfile()
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
-
-    val accountEmail: String? get() = authRepository.currentUser?.email
-
     private val _form = MutableStateFlow(ProfileFormState())
     val form: StateFlow<ProfileFormState> = _form.asStateFlow()
+
+    val profile: StateFlow<ProfileUiState> = profileRepository.observeCurrentProfile()
+        .map { saved ->
+            onProfileLoaded(saved)
+            ProfileUiState(profile = saved, isLoading = false)
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ProfileUiState())
+
+    val accountEmail: StateFlow<String?> = authRepository.observeAuthState()
+        .map { it?.email }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), authRepository.currentUser?.email)
 
     private val _events = Channel<ProfileEvent>(Channel.BUFFERED)
     val events: Flow<ProfileEvent> = _events.receiveAsFlow()
@@ -66,7 +83,7 @@ class ProfileViewModel(
     private var loadedFromDb = false
 
     /** Nạp lựa chọn từ hồ sơ đã lưu đúng 1 lần (không ghi đè khi người dùng đang sửa). */
-    fun onProfileLoaded(profile: HealthProfile?) {
+    private fun onProfileLoaded(profile: HealthProfile?) {
         if (loadedFromDb || profile == null) return
         loadedFromDb = true
         _form.update { it.copy(conditions = profile.conditions.toSet(), allergies = profile.allergies.toSet()) }

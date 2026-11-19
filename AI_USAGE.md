@@ -75,3 +75,12 @@ Chi tiết khai báo trước lần biên tập này, gồm prompt và danh sác
 Nhóm cần kiểm tra lại phạm vi hỗ trợ AI, bổ sung thông tin thành viên và công việc thủ công có bằng chứng, đồng thời tự đánh giá mức sử dụng AI theo quy định môn học. Tài liệu này chưa đưa ra tỷ lệ phần trăm AI khi nhóm chưa có đánh giá xác nhận.
 
 Khóa ký, mật khẩu và API key thật được giữ riêng ngoài Git và bộ nộp.
+
+## 7. Bổ sung Milestone 02 — 19/11/2026
+
+| Câu hỏi / yêu cầu của người dùng | Hướng xử lý và phạm vi AI hỗ trợ |
+| --- | --- |
+| Hoàn thiện M2 cho tôi. | Đối chiếu MVVM, ViewBinding, vòng đời Fragment và quy tắc loại file IDE/build theo đề bài đã cung cấp. Tạo nhánh cục bộ `feature/milestone02-mvvm` từ `main` tại `e541ded6dc810d93c63b2101cefab72fcf5908d4`. |
+| Hướng xử lý phần còn thiếu | Giữ kiến trúc MVVM đã có; phân biệt trạng thái đang tải/chưa có hồ sơ; chuyển dữ liệu mặc định và email tài khoản qua StateFlow của ViewModel; bổ sung hồi quy cho luồng này. Loại `.idea` khỏi chỉ mục Git, giữ file IDE trên máy; bổ sung file URL, báo cáo M2 và ZIP mã nguồn sạch. |
+
+Trong phần M2 này, Codex trực tiếp hỗ trợ chỉnh sửa các file trên, chạy build/unit tests/lint và đóng gói mã nguồn theo yêu cầu. Không quy toàn bộ mã nguồn hiện có cho phiên hỗ trợ M2. Người dùng cung cấp đề bài, repository và quyết định phạm vi công việc. Chưa có xác nhận về kiểm thử thủ công hoặc phân công WBS mới của từng thành viên; nhóm cần tự kiểm tra và giải thích được phần mã nguồn trước khi nộp. Không tự đặt tỷ lệ sử dụng AI hay bổ sung lịch sử đóng góp không có bằng chứng.

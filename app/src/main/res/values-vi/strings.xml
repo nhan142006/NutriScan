@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">NutriScan</string>
+    <string name="medical_disclaimer">Kết quả AI chỉ mang tính tham khảo, không thay thế tư vấn y tế chuyên môn.</string>
+    <string name="offline_banner">Đang offline – dữ liệu đã lưu vẫn dùng được, ảnh chụp sẽ tự phân tích khi có mạng.</string>
+
+    <!-- Bottom navigation -->
+    <string name="nav_home">Trang chủ</string>
+    <string name="nav_scan">Quét</string>
+    <string name="nav_history">Lịch sử</string>
+    <string name="nav_recipes">Món ăn</string>
+    <string name="nav_profile">Hồ sơ</string>
+
+    <!-- Chung -->
+    <string name="action_retry">Thử lại</string>
+    <string name="action_cancel">Hủy</string>
+    <string name="action_delete">Xóa</string>
+    <string name="action_save">Lưu</string>
+    <string name="action_edit">Sửa</string>
+    <string name="action_close">Đóng</string>
+    <string name="action_see_all">Xem tất cả</string>
+    <string name="state_empty">Chưa có dữ liệu.</string>
+    <string name="image_description">Ảnh minh họa</string>
+
+    <!-- Đánh giá -->
+    <string name="rating_suitable">Phù hợp</string>
+    <string name="rating_limit">Hạn chế</string>
+    <string name="rating_avoid">Tránh</string>
+    <string name="status_pending">Đang chờ phân tích</string>
+    <string name="status_failed">Phân tích lỗi</string>
+    <string name="severity_low">Thấp</string>
+    <string name="severity_medium">Trung bình</string>
+    <string name="severity_high">Cao</string>
+
+    <!-- Lỗi mạng (Milestone 04) -->
+    <string name="error_no_internet">Không có kết nối Internet. Hãy tắt Chế độ máy bay hoặc kiểm tra Wi-Fi/4G.</string>
+    <string name="error_timeout">Máy chủ phản hồi quá lâu. Vui lòng thử lại.</string>
+    <string name="error_bad_request">Yêu cầu không hợp lệ (HTTP 400).</string>
+    <string name="error_unauthorized">Không có quyền truy cập dữ liệu.</string>
+    <string name="error_not_found">Không tìm thấy dữ liệu (HTTP 404).</string>
+    <string name="error_too_many_requests">Bạn thao tác quá nhanh, vui lòng đợi một chút rồi thử lại.</string>
+    <string name="error_server">Máy chủ đang gặp sự cố (HTTP 5xx). Vui lòng thử lại sau.</string>
+    <string name="error_parse">Dữ liệu trả về không hợp lệ.</string>
+    <string name="error_ai_not_configured">Chưa cấu hình GEMINI_API_KEY trong local.properties – đang dùng phân tích offline.</string>
+    <string name="error_ai_invalid">AI trả về dữ liệu không hợp lệ. Bạn có thể thử lại.</string>
+    <string name="error_unknown">Đã xảy ra lỗi không xác định.</string>
+    <string name="error_with_http_code">%1$s (HTTP %2$d)</string>
+    <string name="switch_language">English</string>
+</resources>

@@ -124,7 +124,12 @@ class RecipeDetailFragment : Fragment() {
         binding.buttonVideo.visibility = if (recipe.youtubeUrl != null) View.VISIBLE else View.GONE
         binding.buttonVideo.setOnClickListener {
             try {
-                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(recipe.youtubeUrl)))
+                // Mở YouTube trong task riêng: nếu không, YouTube nằm chồng trong task của NutriScan
+                // và bấm icon NutriScan ở launcher sẽ quay lại YouTube thay vì app.
+                startActivity(
+                    Intent(Intent.ACTION_VIEW, Uri.parse(recipe.youtubeUrl))
+                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                )
             } catch (error: ActivityNotFoundException) {
                 binding.root.showSnackbar(getString(R.string.error_unknown))
             }

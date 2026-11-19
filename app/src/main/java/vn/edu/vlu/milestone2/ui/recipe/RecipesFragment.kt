@@ -1,5 +1,6 @@
 package vn.edu.vlu.milestone2.ui.recipe
 
+import androidx.lifecycle.lifecycleScope
 import android.graphics.Rect
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -48,10 +49,11 @@ class RecipesFragment : Fragment() {
         val openRecipe: (RecipeCardItem) -> Unit = { item ->
             findNavController().navigate(R.id.action_recipes_to_detail, bundleOf(NavArgs.RECIPE_ID to item.id))
         }
-        val aiAdapter = RecipeCardAdapter(horizontal = true, onClick = openRecipe)
-        val matchesAdapter = RecipeCardAdapter(horizontal = true, onClick = openRecipe)
-        val myAdapter = RecipeCardAdapter(horizontal = true, onClick = openRecipe)
-        val browseAdapter = RecipeCardAdapter(horizontal = false, onClick = openRecipe)
+        val translations = RecipeTranslation(this)
+        val aiAdapter = RecipeCardAdapter(translations, viewLifecycleOwner.lifecycleScope, horizontal = true, onClick = openRecipe)
+        val matchesAdapter = RecipeCardAdapter(translations, viewLifecycleOwner.lifecycleScope, horizontal = true, onClick = openRecipe)
+        val myAdapter = RecipeCardAdapter(translations, viewLifecycleOwner.lifecycleScope, horizontal = true, onClick = openRecipe)
+        val browseAdapter = RecipeCardAdapter(translations, viewLifecycleOwner.lifecycleScope, horizontal = false, onClick = openRecipe)
 
         // Phần đầu là item 0 của RecyclerView chính; lưới "Khám phá" là các item sau và được tái
         // sử dụng view khi cuộn (trước đây cả lưới nằm trong NestedScrollView nên bị đo/vẽ toàn bộ).

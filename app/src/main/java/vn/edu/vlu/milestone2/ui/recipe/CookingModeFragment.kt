@@ -39,7 +39,11 @@ class CookingModeFragment : Fragment() {
             }
         }
 
-        collectWithLifecycle(viewModel.uiState) { state ->
+        val translations = RecipeTranslation(this)
+        val localized = viewModel.uiState.withRecipeTranslation { state ->
+            state.recipe?.let { state.copy(recipe = translations.recipe(it)) } ?: state
+        }
+        collectWithLifecycle(localized) { state ->
             val recipe = state.recipe ?: return@collectWithLifecycle
             binding.textRecipeTitle.text = recipe.title
             val total = state.totalSteps

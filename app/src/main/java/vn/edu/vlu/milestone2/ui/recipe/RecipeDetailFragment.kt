@@ -54,7 +54,13 @@ class RecipeDetailFragment : Fragment() {
                 .show()
         }
 
-        collectWithLifecycle(viewModel.uiState) { state ->
+        val translations = RecipeTranslation(this)
+        val localized = viewModel.uiState.withRecipeTranslation { state ->
+            if (state is UiState.Success) {
+                UiState.Success(state.data.copy(recipe = translations.recipe(state.data.recipe)))
+            } else state
+        }
+        collectWithLifecycle(localized) { state ->
             binding.networkState.showState(state, binding.groupContent, onRetry = viewModel::load)
             binding.buttonCook.isEnabled = state is UiState.Success && state.data.recipe.steps.isNotEmpty()
             if (state is UiState.Success) render(state.data) else hideOptional()

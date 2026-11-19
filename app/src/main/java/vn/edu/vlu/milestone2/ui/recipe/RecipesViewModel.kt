@@ -170,7 +170,7 @@ class RecipesViewModel(
         imageUrl = imageUrl,
         subtitle = fitReason?.lineSequence()?.firstOrNull() ?: category,
         badge = checker.check(ingredients, profile)?.rating,
-        isAi = source == RecipeSource.AI
+        source = source
     )
 
     private fun RecipeSummary.toCard() = RecipeCardItem(

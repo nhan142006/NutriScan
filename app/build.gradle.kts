@@ -13,7 +13,7 @@ val localProperties = Properties().apply {
     if (file.exists()) file.inputStream().use { load(it) }
 }
 val geminiApiKey: String = localProperties.getProperty("GEMINI_API_KEY", "")
-val geminiModel: String = localProperties.getProperty("GEMINI_MODEL", "gemini-2.5-flash")
+val geminiModel: String = localProperties.getProperty("GEMINI_MODEL", "gemini-3.1-flash-lite")
 val mealDbApiKey = localProperties.getProperty("MEAL_DB_API_KEY", "1").trim()
 fun String.asBuildConfigString(): String = "\"" + replace("\\", "\\\\")
     .replace("\"", "\\\"").replace("\n", "\\n").replace("\r", "\\r") + "\""

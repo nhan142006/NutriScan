@@ -1,6 +1,6 @@
 # Copy to local.properties. Android Studio fills sdk.dir for your machine.
 # Never commit local.properties or put real credentials in this example.
 GEMINI_API_KEY=
-GEMINI_MODEL=gemini-2.5-flash
+GEMINI_MODEL=gemini-3.1-flash-lite
 # TheMealDB's public development key is 1; replace privately if using a team key.
 MEAL_DB_API_KEY=1

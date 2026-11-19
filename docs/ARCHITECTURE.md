@@ -9,8 +9,8 @@ Tài liệu này đối chiếu code hiện tại với **Proposal (bản sửa)
 
    ```properties
    GEMINI_API_KEY=your_key_from_aistudio.google.com
-   # tùy chọn, mặc định gemini-2.5-flash
-   GEMINI_MODEL=gemini-2.5-flash
+   # tùy chọn, mặc định gemini-3.1-flash-lite
+   GEMINI_MODEL=gemini-3.1-flash-lite
    ```
 
    Chưa có key app vẫn chạy: quét mã vạch dùng phân tích offline theo luật (`NutritionAnalyzer`), ảnh nhãn nằm trong hàng đợi.

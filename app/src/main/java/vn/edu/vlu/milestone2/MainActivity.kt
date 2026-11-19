@@ -1,5 +1,7 @@
 package vn.edu.vlu.milestone2
 
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
 import android.os.Bundle
 import android.view.View
 import androidx.activity.enableEdgeToEdge
@@ -60,7 +62,11 @@ class MainActivity : AppCompatActivity() {
         binding.bottomNavigation.setupWithNavController(navController)
         binding.toolbar.inflateMenu(R.menu.menu_main)
         binding.toolbar.setOnMenuItemClickListener { item ->
-            if (item.itemId == R.id.action_logout) {
+            if (item.itemId == R.id.action_language) {
+                val language = if (resources.configuration.locales[0].language == "vi") "en" else "vi"
+                AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(language))
+                true
+            } else if (item.itemId == R.id.action_logout) {
                 sessionViewModel.signOut()
                 true
             } else {

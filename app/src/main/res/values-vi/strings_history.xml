@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="history_title">Lịch sử quét</string>
+    <string name="history_filter_all">Tất cả</string>
+    <string name="history_filter_pending">Chờ / lỗi</string>
+    <string name="history_hint">Vuốt sang ngang để xóa · Nhấn giữ để tìm món nấu với sản phẩm</string>
+    <string name="history_empty">Chưa có lần quét nào.\nDữ liệu được lưu trên máy nên xem được cả khi offline.</string>
+    <string name="history_empty_filter">Không có kết quả cho bộ lọc này.</string>
+    <plurals name="history_count">
+        <item quantity="one">%d lần quét</item>
+        <item quantity="other">%d lần quét</item>
+    </plurals>
+</resources>

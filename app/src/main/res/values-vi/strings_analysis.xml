@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="analysis_title">Kết quả phân tích</string>
+    <string name="analysis_flagged_title">Thành phần cần lưu ý</string>
+    <string name="analysis_no_flags">Không có thành phần đáng lo ngại với hồ sơ của bạn.</string>
+    <string name="analysis_pending_offline">Ảnh đã được nén và lưu an toàn. NutriScan sẽ tự gửi cho AI ngay khi có mạng – bạn có thể rời màn hình này.</string>
+    <string name="analysis_pending_online">Gemini đang đọc nhãn thành phần…</string>
+    <string name="analysis_note_hint">Ghi chú cá nhân (ví dụ: mua cho bố)</string>
+    <string name="analysis_note_saved">Đã lưu ghi chú</string>
+    <string name="analysis_find_recipes">Nấu món với sản phẩm này</string>
+    <string name="analysis_view_product">Xem sản phẩm</string>
+    <string name="analysis_delete_title">Xóa lần quét này?</string>
+    <string name="analysis_delete_message">Bản ghi và ảnh nhãn đã lưu trên máy sẽ bị xóa vĩnh viễn.</string>
+    <string name="analysis_deleted">Đã xóa lần quét</string>
+    <string name="analysis_not_found">Không tìm thấy lần quét này.</string>
+</resources>

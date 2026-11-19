@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="profile_title">Hồ sơ sức khỏe</string>
+    <string name="profile_intro">Thông tin này được dùng để AI đánh giá sản phẩm và gợi ý món ăn. Lưu trên máy (Room) và đồng bộ lên Firestore.</string>
+    <string name="profile_updated_at">Cập nhật %1$s</string>
+    <string name="profile_not_created">Chưa tạo hồ sơ</string>
+    <string name="profile_full_name">Họ và tên</string>
+    <string name="profile_age">Tuổi</string>
+    <string name="profile_calories">Năng lượng/ngày</string>
+    <string name="profile_diet_goal">Mục tiêu ăn uống</string>
+    <string name="profile_conditions">Tình trạng sức khỏe</string>
+    <string name="profile_allergies">Dị ứng thực phẩm</string>
+    <string name="profile_add_condition">Thêm tình trạng khác</string>
+    <string name="profile_add_allergy">Thêm dị ứng khác</string>
+    <string name="profile_create">Tạo hồ sơ</string>
+    <string name="profile_update">Cập nhật hồ sơ</string>
+    <string name="profile_delete">Xóa hồ sơ</string>
+    <string name="profile_delete_title">Xóa hồ sơ sức khỏe?</string>
+    <string name="profile_delete_message">Hồ sơ sẽ bị xóa khỏi máy và Firestore. Lịch sử quét vẫn được giữ lại.</string>
+    <string name="profile_saved">Đã lưu hồ sơ</string>
+    <string name="profile_deleted">Đã xóa hồ sơ</string>
+    <string name="profile_account">Tài khoản</string>
+    <string name="profile_error_name">Vui lòng nhập họ tên.</string>
+    <string name="profile_error_age">Tuổi từ 1 đến 120.</string>
+    <string name="profile_error_calories">Từ 800 đến 5000 kcal.</string>
+</resources>

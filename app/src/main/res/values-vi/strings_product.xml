@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="product_detail_title">Chi tiết sản phẩm</string>
+    <string name="product_not_found_title">Chưa có trong Open Food Facts</string>
+    <string name="product_not_found_body">Sản phẩm địa phương thường chưa có dữ liệu. Hãy chụp nhãn thành phần để Gemini AI đọc và phân tích giúp bạn.</string>
+    <string name="product_take_label_photo">Chụp nhãn thành phần</string>
+    <string name="product_from_cache">Dữ liệu đã lưu offline</string>
+    <string name="product_nutrition_title">Dinh dưỡng / 100 g</string>
+    <string name="product_ingredients_title">Thành phần</string>
+    <string name="product_ingredients_unknown">Chưa có danh sách thành phần.</string>
+    <string name="product_allergens">Chất gây dị ứng: %1$s</string>
+    <string name="product_analyze">Phân tích theo hồ sơ của tôi</string>
+    <string name="product_find_recipes">Tìm món ăn với sản phẩm này</string>
+    <string name="product_nova">NOVA %1$d</string>
+    <string name="product_ai_fallback">Đã dùng phân tích offline: %1$s</string>
+    <string name="nutrient_energy">Năng lượng\n%1$s kcal</string>
+    <string name="nutrient_sugars">Đường\n%1$s g</string>
+    <string name="nutrient_fat">Chất béo\n%1$s g</string>
+    <string name="nutrient_sat_fat">Bão hòa\n%1$s g</string>
+    <string name="nutrient_salt">Muối\n%1$s g</string>
+    <string name="nutrient_proteins">Đạm\n%1$s g</string>
+    <string name="nutrient_carbs">Carb\n%1$s g</string>
+    <string name="nutrient_fiber">Chất xơ\n%1$s g</string>
+
+    <string name="favorites_title">Sản phẩm yêu thích</string>
+    <string name="favorites_empty">Chưa có sản phẩm yêu thích.\nNhấn ♥ ở trang chi tiết để lưu dùng offline.</string>
+    <string name="favorites_add">Thêm vào yêu thích</string>
+    <string name="favorites_remove">Bỏ yêu thích</string>
+    <string name="favorites_added">Đã lưu vào yêu thích (xem được khi offline)</string>
+    <string name="favorites_removed">Đã bỏ khỏi yêu thích</string>
+    <string name="action_undo">Hoàn tác</string>
+</resources>

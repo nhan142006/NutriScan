@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="login_title">Đăng nhập</string>
+    <string name="register_title">Tạo tài khoản</string>
+    <string name="login_heading">Chào mừng đến NutriScan</string>
+    <string name="login_subtitle">Quét nhãn thực phẩm, nhận đánh giá theo hồ sơ sức khỏe của riêng bạn.</string>
+    <string name="register_heading">Tạo tài khoản mới</string>
+    <string name="register_subtitle">Hồ sơ sức khỏe được lưu offline và đồng bộ an toàn lên cloud.</string>
+    <string name="register_password_helper">Tối thiểu 6 ký tự</string>
+    <string name="auth_display_name">Họ và tên</string>
+    <string name="auth_email">Email</string>
+    <string name="auth_password">Mật khẩu</string>
+    <string name="auth_confirm_password">Nhập lại mật khẩu</string>
+    <string name="auth_login_button">Đăng nhập</string>
+    <string name="auth_register_button">Đăng ký</string>
+    <string name="auth_go_register">Chưa có tài khoản? Đăng ký</string>
+    <string name="auth_go_login">Đã có tài khoản? Đăng nhập</string>
+    <string name="auth_logout">Đăng xuất</string>
+    <string name="auth_validation_name">Vui lòng nhập họ và tên.</string>
+    <string name="auth_validation_email">Email không hợp lệ.</string>
+    <string name="auth_validation_password">Mật khẩu phải có ít nhất 6 ký tự.</string>
+    <string name="auth_validation_confirm">Mật khẩu nhập lại không khớp.</string>
+    <string name="auth_error_invalid_credentials">Email hoặc mật khẩu không đúng.</string>
+    <string name="auth_error_user_not_found">Tài khoản không tồn tại hoặc đã bị vô hiệu hóa.</string>
+    <string name="auth_error_email_in_use">Email này đã được đăng ký.</string>
+    <string name="auth_error_weak_password">Mật khẩu quá yếu (tối thiểu 6 ký tự).</string>
+    <string name="auth_error_invalid_email">Định dạng email không hợp lệ.</string>
+    <string name="auth_error_network">Không có kết nối mạng. Hãy tắt Chế độ máy bay rồi thử lại.</string>
+    <string name="auth_error_too_many_requests">Đăng nhập sai quá nhiều lần. Vui lòng thử lại sau.</string>
+    <string name="auth_error_unknown">Không thể xác thực. Vui lòng thử lại.</string>
+</resources>

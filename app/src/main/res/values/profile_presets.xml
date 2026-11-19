@@ -1,0 +1,23 @@
+<resources>
+  <string-array name="profile_preset_labels">
+    <item>Diabetes</item>
+    <item>High blood pressure</item>
+    <item>High cholesterol</item>
+    <item>Kidney disease</item>
+    <item>Gout</item>
+    <item>Peanuts</item>
+    <item>Milk / lactose</item>
+    <item>Gluten</item>
+    <item>Seafood</item>
+    <item>Eggs</item>
+    <item>Soy</item>
+    <item>Nuts</item>
+    <item>Sesame</item>
+    <item>Maintain weight</item>
+    <item>Lose weight</item>
+    <item>Build muscle</item>
+    <item>Vegetarian</item>
+    <item>Low sugar</item>
+    <item>Low salt</item>
+  </string-array>
+</resources>

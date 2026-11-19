@@ -1,0 +1,23 @@
+<resources>
+  <string-array name="profile_preset_labels">
+    <item>Tiểu đường</item>
+    <item>Cao huyết áp</item>
+    <item>Mỡ máu cao</item>
+    <item>Bệnh thận</item>
+    <item>Gout</item>
+    <item>Đậu phộng</item>
+    <item>Sữa / Lactose</item>
+    <item>Gluten</item>
+    <item>Hải sản</item>
+    <item>Trứng</item>
+    <item>Đậu nành</item>
+    <item>Hạt</item>
+    <item>Mè</item>
+    <item>Giữ cân</item>
+    <item>Giảm cân</item>
+    <item>Tăng cơ</item>
+    <item>Ăn chay</item>
+    <item>Ít đường</item>
+    <item>Ít muối</item>
+  </string-array>
+</resources>

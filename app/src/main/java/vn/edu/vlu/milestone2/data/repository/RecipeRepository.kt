@@ -3,6 +3,9 @@ package vn.edu.vlu.milestone2.data.repository
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
@@ -23,7 +26,9 @@ import vn.edu.vlu.milestone2.data.model.RecipeSummary
 import vn.edu.vlu.milestone2.data.remote.gemini.GeminiDataSource
 import vn.edu.vlu.milestone2.data.remote.mealdb.MealDbApi
 import vn.edu.vlu.milestone2.data.remote.mealdb.MealDto
+import vn.edu.vlu.milestone2.data.remote.mealdb.MealsResponseDto
 import vn.edu.vlu.milestone2.domain.HealthKeywords
+import vn.edu.vlu.milestone2.domain.RecipeSearchTranslator
 import java.util.UUID
 
 /**
@@ -142,9 +147,37 @@ class RecipeRepository(
         safeApiCall(ioDispatcher) { api.filterByIngredient(ingredient) }
             .map { response -> response.meals.orEmpty().mapNotNull { it.toSummaryOrNull() } }
 
-    suspend fun searchRecipes(query: String): NetworkResult<List<RecipeSummary>> =
-        safeApiCall(ioDispatcher) { api.searchMeals(query.trim()) }
-            .map { response -> response.meals.orEmpty().mapNotNull { it.toSummaryOrNull() } }
+    /**
+     * Tìm món bằng tiếng Việt hoặc tiếng Anh. TheMealDB chỉ có tên tiếng Anh nên từ khóa được dịch
+     * offline ([RecipeSearchTranslator]: "gà rán" → "fried chicken"), rồi gọi song song search.php
+     * theo tên, filter.php theo nguyên liệu/nhóm món; gộp, bỏ trùng và xếp món khớp nhiều từ khóa lên đầu.
+     * Chỉ báo lỗi khi mọi request đều lỗi.
+     */
+    suspend fun searchRecipes(query: String): NetworkResult<List<RecipeSummary>> = coroutineScope {
+        val plan = RecipeSearchTranslator.translate(query)
+        val requests = buildList<suspend () -> MealsResponseDto> {
+            plan.nameQueries.forEach { name -> add { api.searchMeals(name) } }
+            plan.ingredientFilters.forEach { ingredient -> add { api.filterByIngredient(ingredient) } }
+            plan.categories.forEach { category -> add { api.filterByCategory(category) } }
+        }.take(MAX_SEARCH_REQUESTS)
+        val results = requests
+            .map { request -> async { safeApiCall(ioDispatcher) { request() } } }
+            .awaitAll()
+        val firstError = results.firstOrNull { it is NetworkResult.Error }
+        if (firstError != null && results.all { it is NetworkResult.Error }) {
+            firstError.map { emptyList<RecipeSummary>() }
+        } else {
+            val meals = results
+                .flatMap { it.getOrNull()?.meals.orEmpty() }
+                .mapNotNull { it.toSummaryOrNull() }
+                .distinctBy { it.id }
+            val ranked = meals.withIndex()
+                .sortedWith(compareByDescending<IndexedValue<RecipeSummary>> { plan.score(it.value.name) }.thenBy { it.index })
+                .map { it.value }
+                .take(SEARCH_RESULT_LIMIT)
+            NetworkResult.Success(ranked)
+        }
+    }
 
     /** Cache-first: món đã lưu/AI/tự tạo đọc từ Room; món TheMealDB lấy API rồi cache để nấu offline. */
     suspend fun loadRecipe(id: String): NetworkResult<Recipe> = withContext(ioDispatcher) { loadRecipeOnIo(id) }
@@ -208,6 +241,8 @@ class RecipeRepository(
         const val RECENT_SCAN_LIMIT = 10
         const val MATCH_LIMIT = 10
         const val AI_CACHE_LIMIT = 6
+        const val MAX_SEARCH_REQUESTS = 6
+        const val SEARCH_RESULT_LIMIT = 60
 
         /** Dùng cho UI: map Rating → nhãn tiếng Việt. */
         fun ratingLabel(rating: Rating): String = when (rating) {

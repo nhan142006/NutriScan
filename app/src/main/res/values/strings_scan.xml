@@ -1,27 +1,26 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="scan_hub_title">Quét sản phẩm</string>
-    <string name="scan_hub_intro">Quét mã vạch để tra Open Food Facts. Sản phẩm Việt Nam chưa có dữ liệu? Hãy chụp nhãn thành phần để AI phân tích.</string>
-    <string name="scan_hub_manual_title">Nhập thủ công</string>
-    <string name="scan_hub_barcode_hint">Mã vạch (8–14 chữ số)</string>
-    <string name="scan_hub_barcode_invalid">Mã vạch chỉ gồm 8 đến 14 chữ số.</string>
-    <string name="scan_hub_lookup">Tra cứu</string>
-    <string name="scan_hub_search_hint">Tìm theo tên (ví dụ: vinamilk)</string>
-    <string name="scan_hub_search_empty">Không tìm thấy sản phẩm phù hợp.</string>
-    <string name="nutriscore_label">Nutri-Score %1$s</string>
-    <string name="nutriscore_unknown">Chưa có Nutri-Score</string>
-    <string name="product_brand_barcode">%1$s · %2$s</string>
-
-    <string name="barcode_title">Quét mã vạch</string>
-    <string name="barcode_hint">Đưa mã vạch vào trong khung</string>
-    <string name="barcode_fallback">Không có mã? Chụp nhãn</string>
-    <string name="camera_title">Chụp nhãn thành phần</string>
-    <string name="camera_tip">Chụp rõ, đủ sáng toàn bộ phần \"Thành phần\"</string>
-    <string name="camera_status_ready">Nhấn nút để chụp</string>
-    <string name="camera_status_saving">Đang nén ảnh (&lt; 1 MB)…</string>
-    <string name="camera_capture">Chụp ảnh</string>
-    <string name="camera_torch">Đèn flash</string>
-    <string name="camera_permission_denied">NutriScan cần quyền Camera để quét. Hãy cấp quyền trong Cài đặt.</string>
-    <string name="camera_error">Không thể chụp ảnh. Vui lòng thử lại.</string>
-    <string name="camera_unavailable">Không khởi động được camera.</string>
+  <string name="scan_hub_title">Scan a product</string>
+  <string name="scan_hub_intro">Scan a barcode to search Open Food Facts. If the product is missing, take a photo of its ingredient label.</string>
+  <string name="scan_hub_manual_title">Enter manually</string>
+  <string name="scan_hub_barcode_hint">Barcode (8–14 digits)</string>
+  <string name="scan_hub_barcode_invalid">Enter 8 to 14 digits.</string>
+  <string name="scan_hub_lookup">Look up</string>
+  <string name="scan_hub_search_hint">Search by name (e.g. Vinamilk)</string>
+  <string name="scan_hub_search_empty">No matching products.</string>
+  <string name="nutriscore_label">Nutri-Score %1$s</string>
+  <string name="nutriscore_unknown">Nutri-Score unavailable</string>
+  <string name="product_brand_barcode">%1$s · %2$s</string>
+  <string name="barcode_title">Scan barcode</string>
+  <string name="barcode_hint">Place the barcode inside the frame</string>
+  <string name="barcode_fallback">No barcode? Photograph label</string>
+  <string name="camera_title">Photograph ingredient label</string>
+  <string name="camera_tip">Capture the entire ingredient list in good light</string>
+  <string name="camera_status_ready">Tap to take a photo</string>
+  <string name="camera_status_saving">Compressing photo (under 1 MB)…</string>
+  <string name="camera_capture">Take photo</string>
+  <string name="camera_torch">Flash</string>
+  <string name="camera_permission_denied">Allow camera access in Settings to scan.</string>
+  <string name="camera_error">Could not take photo. Try again.</string>
+  <string name="camera_unavailable">Could not start camera.</string>
 </resources>

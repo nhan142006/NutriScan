@@ -15,6 +15,7 @@
 local.properties
 /.signing/
 /submission/
+/.local-archive/
 *.jks
 *.keystore
 *.hprof

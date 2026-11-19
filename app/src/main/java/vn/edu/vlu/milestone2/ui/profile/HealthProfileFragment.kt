@@ -26,6 +26,13 @@ class HealthProfileFragment : Fragment() {
     private val viewModel: ProfileViewModel by viewModels { ProfileViewModel.Factory }
     private var fieldsFilled = false
 
+    private val presetLabels by lazy {
+        val keys = ProfileFormState.PRESET_CONDITIONS + ProfileFormState.PRESET_ALLERGIES + ProfileFormState.DIET_GOALS
+        keys.zip(resources.getStringArray(R.array.profile_preset_labels)).toMap()
+    }
+
+    private fun label(value: String) = presetLabels[value] ?: value
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentHealthProfileBinding.inflate(inflater, container, false)
         return binding.root
@@ -47,7 +54,9 @@ class HealthProfileFragment : Fragment() {
                 name = binding.editName.text.toString(),
                 ageText = binding.editAge.text.toString(),
                 calorieText = binding.editCalories.text.toString(),
-                dietGoal = binding.autoDietGoal.text.toString()
+                dietGoal = viewModel.form.value.dietGoalOptions.firstOrNull {
+                    label(it) == binding.autoDietGoal.text.toString()
+                } ?: binding.autoDietGoal.text.toString()
             )
         }
         binding.buttonDelete.setOnClickListener {
@@ -74,7 +83,7 @@ class HealthProfileFragment : Fragment() {
         collectWithLifecycle(viewModel.form) { form ->
             if (binding.autoDietGoal.adapter == null) {
                 binding.autoDietGoal.setAdapter(
-                    ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, form.dietGoalOptions)
+                    ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, form.dietGoalOptions.map(::label))
                 )
             }
             binding.layoutName.error = form.nameError?.let { getString(it) }
@@ -92,7 +101,7 @@ class HealthProfileFragment : Fragment() {
                     binding.editName.text?.clear()
                     binding.editAge.text?.clear()
                     binding.editCalories.setText(viewModel.form.value.defaultCalorieTarget.toString())
-                    binding.autoDietGoal.setText(viewModel.form.value.defaultDietGoal, false)
+                    binding.autoDietGoal.setText(label(viewModel.form.value.defaultDietGoal), false)
                     binding.root.showSnackbar(getString(R.string.profile_deleted))
                 }
             }
@@ -110,7 +119,7 @@ class HealthProfileFragment : Fragment() {
         binding.editName.setText(profile?.fullName.orEmpty())
         binding.editAge.setText(profile?.age?.toString().orEmpty())
         binding.editCalories.setText((profile?.dailyCalorieTarget ?: viewModel.form.value.defaultCalorieTarget).toString())
-        binding.autoDietGoal.setText(profile?.dietGoal?.ifBlank { null } ?: viewModel.form.value.defaultDietGoal, false)
+        binding.autoDietGoal.setText(label(profile?.dietGoal?.ifBlank { null } ?: viewModel.form.value.defaultDietGoal), false)
     }
 
     /** Dựng lại chip chỉ khi danh sách thay đổi; trạng thái chọn lấy từ ViewModel (nguồn sự thật). */
@@ -120,14 +129,15 @@ class HealthProfileFragment : Fragment() {
         selected: Set<String>,
         onToggle: (String, Boolean) -> Unit
     ) {
-        val current = (0 until group.childCount).map { (group.getChildAt(it) as Chip).text.toString() }
+        val current = (0 until group.childCount).map { group.getChildAt(it).tag }
         if (current != options) {
             group.removeAllViews()
             options.forEach { option ->
                 group.addView(
                     Chip(requireContext(), null, com.google.android.material.R.attr.chipStyle).apply {
                         id = View.generateViewId()
-                        text = option
+                        tag = option
+                        text = label(option)
                         isCheckable = true
                     }
                 )
@@ -136,8 +146,8 @@ class HealthProfileFragment : Fragment() {
         for (index in 0 until group.childCount) {
             val chip = group.getChildAt(index) as Chip
             chip.setOnCheckedChangeListener(null)
-            chip.isChecked = chip.text.toString() in selected
-            chip.setOnCheckedChangeListener { _, isChecked -> onToggle(chip.text.toString(), isChecked) }
+            chip.isChecked = options[index] in selected
+            chip.setOnCheckedChangeListener { _, isChecked -> onToggle(options[index], isChecked) }
         }
     }
 

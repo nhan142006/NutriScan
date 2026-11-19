@@ -4,14 +4,23 @@
 
 | Nội dung | Ghi nhận |
 | --- | --- |
-| Công cụ trong phiên Milestone 05 | ChatGPT (Codex) |
-| Ngày làm việc | 18/11/2026 |
-| Phạm vi | Rà soát và bổ sung hiệu năng, bảo mật, ký Release và tài liệu nộp bài |
-| Nền mã nguồn | Nhánh main tại commit `c11cab7`, đã có các module của ứng dụng |
+| Công cụ | ChatGPT (Codex); Claude được ghi nhận trong khai báo lịch sử Milestone 04 |
+| Ngày cập nhật khai báo | 20/11/2026 |
+| Phạm vi ghi nhận | Hỏi–đáp, định hướng, rà soát; hỗ trợ trực tiếp một số phần code, kiểm thử, tài liệu và đóng gói nêu bên dưới |
+| Nền mã nguồn M05 | Nhánh main tại commit `c11cab7`, đã có các module của ứng dụng |
+| Bản Final được kiểm tra ngày 20/11 | Source và APK trong ZIP cùng ở `e541ded`; main công khai được đối chiếu ở `e1272da` |
 
 Nhóm sử dụng AI để giải thích vấn đề, đề xuất hướng xử lý và hỗ trợ thực hiện các thay đổi theo yêu cầu. Người dùng cung cấp đề bài, mã nguồn và các tệp cần đối chiếu, xác định phạm vi công việc và quyết định việc xuất bản. Trong phiên này, Codex cũng trực tiếp hỗ trợ chỉnh sửa code, chạy kiểm tra và chuẩn bị các tệp phát hành.
 
 Các nội dung bên dưới tóm tắt câu hỏi và hướng xử lý từ trao đổi thực tế.
+
+## Mức tự ước lượng của nhóm và giới hạn kiểm chứng
+
+Theo thông tin người dùng cung cấp, nhóm đưa ra mức tự ước lượng sử dụng AI **không quá 46%** thông qua trao đổi nội bộ giữa các thành viên. Đây là **ước lượng do nhóm tự khai**, chưa có bảng thống kê khối lượng hoặc phương pháp tính để kiểm chứng độc lập.
+
+Mức tự khai này thấp hơn giới hạn **50%** được nêu trong ảnh yêu cầu Final. Tuy nhiên, trao đổi nội bộ chưa đủ để chứng minh tỷ lệ thực tế hoặc bảo đảm không vượt giới hạn, cho toàn dự án hay cho từng milestone. Tài liệu ghi nhận ý kiến tự đánh giá của nhóm, không chứng nhận một tỷ lệ đã đo. Nhóm cần làm rõ phạm vi tính và căn cứ nếu dùng mức này trong bản nộp.
+
+Phạm vi hỗ trợ thực tế gồm hỏi–đáp và định hướng, đồng thời có trực tiếp sửa code, tạo/chạy kiểm thử và chuẩn bị tài liệu/phát hành như các mục bên dưới. Chưa định lượng mức sửa code so với tổng khối lượng công việc của nhóm. Phần mã nguồn có sẵn được đối chiếu với khai báo lịch sử khi đánh giá tỷ lệ toàn dự án.
 
 ## 1. Trao đổi về Milestone 05
 
@@ -50,7 +59,7 @@ Các thay đổi này bổ sung vào ứng dụng đã có trên main. Phạm vi
 
 ## 4. Kết quả và giới hạn kiểm chứng
 
-Codex đã hỗ trợ chạy kiểm chứng trong workspace; bằng chứng được lưu cùng bộ nộp:
+Kết quả M05 được ghi nhận ngày 18/11/2026, với Codex hỗ trợ chạy kiểm chứng trong workspace; không tự áp dụng những kết quả này cho main mới hoặc cho bản Final chưa được kiểm thử lại:
 
 - 25 unit tests và 6 device tests đạt, không có failure/error/skipped.
 - Lint không có lỗi; còn 31 cảnh báo Debug và 32 cảnh báo Release.
@@ -58,7 +67,7 @@ Codex đã hỗ trợ chạy kiểm chứng trong workspace; bằng chứng đư
 - Demo trên máy ảo dài khoảng 142 giây, sử dụng tài khoản test và dữ liệu thử có nhãn rõ.
 - Chưa xác nhận cuộn ổn định 60 fps; mẫu cuộn công thức có tỷ lệ jank cao hơn baseline.
 - Chưa cấu hình Gemini API key thật nên mới kiểm chứng fallback offline.
-- WBS của từng thành viên, GitHub Release/tag và link video công khai cần được nhóm hoàn tất.
+- Tại lần đối chiếu ngày 20/11, Release/tag `v1.0.0-release` đã tồn tại công khai và APK trong ZIP khớp asset Release. WBS/phần việc thủ công của từng thành viên vẫn cần được nhóm xác nhận; việc có Release không chứng minh tỷ lệ sử dụng AI.
 
 Kết quả trên mô tả phạm vi đã đo và kiểm tra; nhóm cần tiếp tục đánh giá trên thiết bị và điều kiện sử dụng thực tế.
 
@@ -72,7 +81,14 @@ Chi tiết khai báo trước lần biên tập này, gồm prompt và danh sác
 
 ## 6. Rà soát trước khi nộp
 
-Nhóm cần kiểm tra lại phạm vi hỗ trợ AI, bổ sung thông tin thành viên và công việc thủ công có bằng chứng, đồng thời tự đánh giá mức sử dụng AI theo quy định môn học. Tài liệu này chưa đưa ra tỷ lệ phần trăm AI khi nhóm chưa có đánh giá xác nhận.
+Nhóm cần kiểm tra lại phạm vi hỗ trợ AI, bổ sung thông tin thành viên và công việc thủ công có bằng chứng, đồng thời tự đánh giá mức sử dụng AI theo quy định môn học. Trước khi xác nhận mức thực tế, cần có:
+
+- Phạm vi được tính: toàn dự án hay từng bài/milestone.
+- Tiêu chí, đơn vị và cách tính được môn học chấp nhận; bao gồm code, kiểm thử, tài liệu và các phần khác thuộc phạm vi tính.
+- Phân công của từng thành viên, phần tự thực hiện và phần AI hỗ trợ, đối chiếu được với công việc thực tế.
+- Xác nhận của nhóm về kết quả tính; không suy tỷ lệ từ tên tác giả commit hoặc tự đặt trọng số để đạt một ngưỡng mong muốn.
+
+Trạng thái hiện tại: **nhóm tự ước lượng không quá 46% qua trao đổi nội bộ; chưa có thống kê định lượng để kiểm chứng**. Việc ghi nhận ước lượng này không thay thế đối chiếu phạm vi AI thực tế ở các mục trên.
 
 Khóa ký, mật khẩu và API key thật được giữ riêng ngoài Git và bộ nộp.
 
@@ -84,3 +100,18 @@ Khóa ký, mật khẩu và API key thật được giữ riêng ngoài Git và 
 | Hướng xử lý phần còn thiếu | Giữ kiến trúc MVVM đã có; phân biệt trạng thái đang tải/chưa có hồ sơ; chuyển dữ liệu mặc định và email tài khoản qua StateFlow của ViewModel; bổ sung hồi quy cho luồng này. Loại `.idea` khỏi chỉ mục Git, giữ file IDE trên máy; bổ sung file URL, báo cáo M2 và ZIP mã nguồn sạch. |
 
 Trong phần M2 này, Codex trực tiếp hỗ trợ chỉnh sửa các file trên, chạy build/unit tests/lint và đóng gói mã nguồn theo yêu cầu. Không quy toàn bộ mã nguồn hiện có cho phiên hỗ trợ M2. Người dùng cung cấp đề bài, repository và quyết định phạm vi công việc. Chưa có xác nhận về kiểm thử thủ công hoặc phân công WBS mới của từng thành viên; nhóm cần tự kiểm tra và giải thích được phần mã nguồn trước khi nộp. Không tự đặt tỷ lệ sử dụng AI hay bổ sung lịch sử đóng góp không có bằng chứng.
+
+## 8. Đối chiếu Final — 20/11/2026
+
+| Câu hỏi / yêu cầu của người dùng | Hướng xử lý và phần AI hỗ trợ |
+| --- | --- |
+| Kiểm tra phần Final theo ảnh yêu cầu. | Đọc bộ ZIP, source, metadata/chữ ký APK, báo cáo PDF, slide PPTX và GitHub; đối chiếu bốn nhóm file bắt buộc, revision và các luồng cần demo. |
+| Xác định còn thiếu gì và sửa ở đâu. | Lập báo cáo chỉ rõ vị trí cần cập nhật kết quả kiểm thử, trách nhiệm thành viên, kịch bản demo và các rủi ro dữ liệu theo tài khoản. |
+
+Phiên kiểm tra Final này không sửa mã nguồn ứng dụng, không thay bộ nộp gốc và không chạy lại toàn bộ UI/device tests. Tài liệu kiểm tra do Codex hỗ trợ soạn. Việc biên tập khai báo hiện tại cũng có AI hỗ trợ. Khai báo lịch sử chi tiết được giữ nguyên tại [docs/AI_USAGE_HISTORY.md](docs/AI_USAGE_HISTORY.md).
+
+## 9. Chuẩn bị bản Final sau rà soát — 20/11/2026
+
+Người dùng yêu cầu dọn nhẹ file phụ, giữ bài làm chính và bảo đảm các chức năng, báo cáo cùng hồ sơ theo đề Final. Codex hỗ trợ tích hợp main `e1272da` với M2 trên nhánh `final-readiness`, xử lý xung đột màn hình hồ sơ để giữ cả trạng thái tải và nhãn Việt/Anh, cập nhật phiên bản 2.0.2 và chuẩn bị kiểm thử/tài liệu/đóng gói. Phạm vi này có trực tiếp sửa code và tài liệu. Nó là công việc tiếp theo, tách khỏi phiên kiểm tra chỉ đọc ở mục 8.
+
+Người dùng yêu cầu sử dụng khóa ký ổn định và khai báo đúng trong báo cáo. Bản Final mới dùng keystore riêng đang có trên máy; không tạo khóa mới hoặc đưa khóa/mật khẩu vào bài nộp. APK cũ có chữ ký khác được giữ nguyên. File phụ được lưu trữ có thể khôi phục; không xóa lịch sử đóng góp hoặc khai báo AI.

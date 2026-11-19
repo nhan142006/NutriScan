@@ -40,8 +40,8 @@ android {
         applicationId = "vn.edu.vlu.milestone2"
         minSdk = 24
         targetSdk = 37
-        versionCode = 3
-        versionName = "2.0.1"
+        versionCode = 4
+        versionName = "2.0.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -98,6 +98,8 @@ ksp {
 }
 
 dependencies {
+    implementation("com.google.mlkit:translate:17.0.3")
+    implementation("com.google.mlkit:language-id:17.0.6")
     // AndroidX + Material 3
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

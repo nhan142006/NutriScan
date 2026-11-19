@@ -1,48 +1,41 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">NutriScan</string>
-    <string name="medical_disclaimer">Kết quả AI chỉ mang tính tham khảo, không thay thế tư vấn y tế chuyên môn.</string>
-    <string name="offline_banner">Đang offline – dữ liệu đã lưu vẫn dùng được, ảnh chụp sẽ tự phân tích khi có mạng.</string>
-
-    <!-- Bottom navigation -->
-    <string name="nav_home">Trang chủ</string>
-    <string name="nav_scan">Quét</string>
-    <string name="nav_history">Lịch sử</string>
-    <string name="nav_recipes">Món ăn</string>
-    <string name="nav_profile">Hồ sơ</string>
-
-    <!-- Chung -->
-    <string name="action_retry">Thử lại</string>
-    <string name="action_cancel">Hủy</string>
-    <string name="action_delete">Xóa</string>
-    <string name="action_save">Lưu</string>
-    <string name="action_edit">Sửa</string>
-    <string name="action_close">Đóng</string>
-    <string name="action_see_all">Xem tất cả</string>
-    <string name="state_empty">Chưa có dữ liệu.</string>
-    <string name="image_description">Ảnh minh họa</string>
-
-    <!-- Đánh giá -->
-    <string name="rating_suitable">Phù hợp</string>
-    <string name="rating_limit">Hạn chế</string>
-    <string name="rating_avoid">Tránh</string>
-    <string name="status_pending">Đang chờ phân tích</string>
-    <string name="status_failed">Phân tích lỗi</string>
-    <string name="severity_low">Thấp</string>
-    <string name="severity_medium">Trung bình</string>
-    <string name="severity_high">Cao</string>
-
-    <!-- Lỗi mạng (Milestone 04) -->
-    <string name="error_no_internet">Không có kết nối Internet. Hãy tắt Chế độ máy bay hoặc kiểm tra Wi-Fi/4G.</string>
-    <string name="error_timeout">Máy chủ phản hồi quá lâu. Vui lòng thử lại.</string>
-    <string name="error_bad_request">Yêu cầu không hợp lệ (HTTP 400).</string>
-    <string name="error_unauthorized">Không có quyền truy cập dữ liệu.</string>
-    <string name="error_not_found">Không tìm thấy dữ liệu (HTTP 404).</string>
-    <string name="error_too_many_requests">Bạn thao tác quá nhanh, vui lòng đợi một chút rồi thử lại.</string>
-    <string name="error_server">Máy chủ đang gặp sự cố (HTTP 5xx). Vui lòng thử lại sau.</string>
-    <string name="error_parse">Dữ liệu trả về không hợp lệ.</string>
-    <string name="error_ai_not_configured">Chưa cấu hình GEMINI_API_KEY trong local.properties – đang dùng phân tích offline.</string>
-    <string name="error_ai_invalid">AI trả về dữ liệu không hợp lệ. Bạn có thể thử lại.</string>
-    <string name="error_unknown">Đã xảy ra lỗi không xác định.</string>
-    <string name="error_with_http_code">%1$s (HTTP %2$d)</string>
+  <string name="app_name">NutriScan</string>
+  <string name="medical_disclaimer">AI results are for reference only. Consult a qualified health professional for medical advice.</string>
+  <string name="offline_banner">Offline. Saved data is available. Label photos will be analyzed when connected.</string>
+  <string name="nav_home">Home</string>
+  <string name="nav_scan">Scan</string>
+  <string name="nav_history">History</string>
+  <string name="nav_recipes">Recipes</string>
+  <string name="nav_profile">Profile</string>
+  <string name="action_retry">Retry</string>
+  <string name="action_cancel">Cancel</string>
+  <string name="action_delete">Delete</string>
+  <string name="action_save">Save</string>
+  <string name="action_edit">Edit</string>
+  <string name="action_close">Close</string>
+  <string name="action_see_all">View all</string>
+  <string name="state_empty">No data yet.</string>
+  <string name="image_description">Illustration</string>
+  <string name="rating_suitable">Suitable</string>
+  <string name="rating_limit">Limit</string>
+  <string name="rating_avoid">Avoid</string>
+  <string name="status_pending">Pending analysis</string>
+  <string name="status_failed">Analysis failed</string>
+  <string name="severity_low">Low</string>
+  <string name="severity_medium">Medium</string>
+  <string name="severity_high">High</string>
+  <string name="error_no_internet">No internet connection. Check airplane mode or your network settings.</string>
+  <string name="error_timeout">The server took too long to respond. Try again.</string>
+  <string name="error_bad_request">Invalid request (HTTP 400).</string>
+  <string name="error_unauthorized">Access denied.</string>
+  <string name="error_not_found">No data found (HTTP 404).</string>
+  <string name="error_too_many_requests">Please wait a moment before trying again.</string>
+  <string name="error_server">Server error (HTTP 5xx). Try again later.</string>
+  <string name="error_parse">Invalid response.</string>
+  <string name="error_ai_not_configured">Gemini key is missing. Using offline analysis.</string>
+  <string name="error_ai_invalid">The AI returned an invalid response. Try again.</string>
+  <string name="error_unknown">An unexpected error occurred.</string>
+  <string name="error_with_http_code">%1$s (HTTP %2$d)</string>
+    <string name="switch_language">Tiếng Việt</string>
 </resources>

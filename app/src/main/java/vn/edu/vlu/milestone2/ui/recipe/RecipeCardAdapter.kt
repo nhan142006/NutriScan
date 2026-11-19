@@ -1,8 +1,14 @@
 package vn.edu.vlu.milestone2.ui.recipe
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import vn.edu.vlu.milestone2.data.local.entity.RecipeSource
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import androidx.annotation.DrawableRes
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -21,10 +27,12 @@ data class RecipeCardItem(
     val imageUrl: String?,
     val subtitle: String?,
     val badge: Rating?,
-    val isAi: Boolean = false
+    val source: RecipeSource = RecipeSource.API
 )
 
-class RecipeCardAdapter(
+internal class RecipeCardAdapter(
+    private val translations: RecipeTranslation,
+    private val scope: CoroutineScope,
     private val horizontal: Boolean,
     private val onClick: (RecipeCardItem) -> Unit
 ) : ListAdapter<RecipeCardItem, RecipeCardAdapter.ViewHolder>(Diff) {
@@ -47,30 +55,54 @@ class RecipeCardAdapter(
     }
 
     inner class ViewHolder(val binding: ItemRecipeBinding) : RecyclerView.ViewHolder(binding.root) {
+        private var titleJob: Job? = null
         private var boundItem: RecipeCardItem? = null
+        private var remoteImageBound = false
+        @DrawableRes private var iconRes = 0
 
         init { binding.root.setOnClickListener { boundItem?.let(onClick) } }
 
         fun bind(item: RecipeCardItem) {
             boundItem = item
             binding.textTitle.text = item.title
+            titleJob?.cancel()
+            titleJob = scope.launch {
+                val title = translations.title(item)
+                if (boundItem === item) binding.textTitle.text = title
+            }
             binding.textSubtitle.text = item.subtitle
             binding.textSubtitle.visibility = if (item.subtitle.isNullOrBlank()) View.GONE else View.VISIBLE
             if (item.imageUrl != null) {
-                binding.imageRecipe.scaleType = android.widget.ImageView.ScaleType.CENTER_CROP
+                binding.imageRecipe.scaleType = ImageView.ScaleType.CENTER_CROP
                 binding.imageRecipe.loadImage(item.imageUrl)
+                remoteImageBound = true
+                iconRes = 0
             } else {
-                binding.imageRecipe.clearImage()
-                binding.imageRecipe.scaleType = android.widget.ImageView.ScaleType.CENTER
-                binding.imageRecipe.setImageResource(if (item.isAi) R.drawable.ic_auto_awesome else R.drawable.ic_restaurant)
+                // Món không có ảnh (món tự tạo / AI): chỉ hủy Glide khi holder từng tải ảnh mạng,
+                // và chỉ đặt lại icon khi đổi loại icon, để giảm việc trên main thread khi cuộn.
+                val icon = if (item.source == RecipeSource.AI) R.drawable.ic_auto_awesome else R.drawable.ic_restaurant
+                if (remoteImageBound) {
+                    binding.imageRecipe.clearImage()
+                    remoteImageBound = false
+                }
+                if (iconRes != icon) {
+                    binding.imageRecipe.scaleType = ImageView.ScaleType.CENTER
+                    binding.imageRecipe.setImageResource(icon)
+                    iconRes = icon
+                }
             }
             binding.textBadge.visibility = if (item.badge != null) View.VISIBLE else View.GONE
             item.badge?.let { binding.textBadge.applyRatingPill(ratingStyle(it)) }
         }
 
         fun recycle() {
+            titleJob?.cancel()
             boundItem = null
-            binding.imageRecipe.clearImage()
+            if (remoteImageBound) {
+                binding.imageRecipe.clearImage()
+                remoteImageBound = false
+                iconRes = 0
+            }
         }
     }
 

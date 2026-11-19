@@ -32,7 +32,14 @@ Mã nguồn dùng ViewBinding cho Activity/Fragment/Adapter; dữ liệu đi qua
 
 > Kết quả AI chỉ mang tính tham khảo, không thay thế tư vấn y tế.
 
-## Milestone 05 — Release 2.0.1
+## Chuẩn bị Final — 2.0.2
+
+Nhánh `final-readiness` ghép main `e1272da` với sửa M2: tải hồ sơ đúng trạng thái,
+giữ ViewBinding theo vòng đời, tìm món tiếng Việt và chuyển ngôn ngữ Việt/Anh.
+Checklist hồ sơ và demo: [docs/FINAL_SUBMISSION.md](docs/FINAL_SUBMISSION.md).
+Các file được chuẩn bị riêng trong `submission/final/`; bộ nộp cũ được giữ nguyên.
+
+## Milestone 05 — Release 2.0.1 (bản trước)
 
 Phần production/security được cập nhật từ `main` tại `c11cab7`, giữ nguyên các module mới của phiên bản 2.0.
 
